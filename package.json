@@ -1,0 +1,22 @@
+{
+  "name": "openchess",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/main.js",
+  "scripts": {
+    "launch": "tsc && node ./dist/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdricms/openchess.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cdricms/openchess/issues"
+  },
+  "homepage": "https://github.com/cdricms/openchess#readme",
+  "dependencies": {
+    "@types/node": "^17.0.19"
+  }
+}
