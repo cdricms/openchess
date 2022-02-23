@@ -10,24 +10,58 @@ import Pawn from "./pieces/Pawn";
 
 export default class Board {
   board: Square[][];
-  fen: string;
+  private fen: string;
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
     this.board = this.generateBoard();
     this.fen = fen;
   }
 
-  public loadPieces() {
+  public getFen() {
+    return this.fen;
+  }
+
+  public setFen(fen: string) {
+    if (this.legalFEN(fen)) {
+      this.fen = fen;
+      this.emptyBoard();
+      this.loadPieces();
+    }
+  }
+
+  public legalFEN(fen: string) {
     let rank = 0;
     let file = 0;
-    let iFEN = 0;
 
-    while (rank < this.board.length) {
-      const char = this.fen[iFEN];
+    for (const char of fen) {
+      const parsed = parseInt(char);
+      if (char === "/") {
+        rank++;
+      } else if (isNaN(parsed)) {
+        file++;
+      } else {
+        file += parsed;
+      }
+    }
+
+    return rank === 7 && file === 64;
+  }
+
+  public emptyBoard() {
+    this.board = this.generateBoard();
+  }
+
+  public loadPieces() {
+    let rank = this.board.length - 1;
+    let file = 0;
+    let iFEN = 0;
+    let char = "";
+
+    while (rank >= 0 && (char = this.fen[iFEN])) {
       const parsed = parseInt(char);
 
       if (char === "/") {
-        rank++;
+        rank--;
         file = 0;
       } else if (isNaN(parsed)) {
         let piece: Piece | null = null;
@@ -42,7 +76,7 @@ export default class Board {
             break;
           case "R":
           case "r":
-            piece = new Rook(char === "q" ? "dark" : "light");
+            piece = new Rook(char === "r" ? "dark" : "light");
             break;
           case "N":
           case "n":
@@ -57,7 +91,7 @@ export default class Board {
             piece = new Pawn(char === "p" ? "dark" : "light");
             break;
         }
-        console.log(file);
+
         this.board[rank][file].piece = piece;
         if (piece) piece.pos = this.board[rank][file].pos;
 
@@ -116,7 +150,7 @@ export default class Board {
   ) {
     for (let rank = this.board.length - 1; rank >= 0; rank--) {
       for (let file = 0; file < this.board[rank].length; file++) {
-        callback(this.getPiece(rank, file), rank, file);
+        callback(this.getSquare(rank, file), rank, file);
       }
     }
   }
@@ -142,9 +176,18 @@ export default class Board {
   }
 
   public getPiece(rank: number, file: number) {
+    const sqre = this.getSquare(rank, file);
+    return sqre ? sqre.piece : null;
+  }
+
+  public getSquare(rank: number, file: number) {
     if (!this.isInRange(rank, file)) return null;
 
     return this.board[rank][file];
+  }
+
+  public movePiece(dst: { rank: number; file: number }, piece: Piece | null) {
+    if (piece) piece.move(dst, this);
   }
 
   public displayInConsole() {
@@ -152,11 +195,11 @@ export default class Board {
     for (let rank = this.board.length - 1; rank >= 0; rank--) {
       let line = "|";
       for (let file = 0; file < this.board[rank].length; file++) {
-        const s = this.getPiece(rank, file);
-        if (!s?.piece) {
+        const piece = this.getPiece(rank, file);
+        if (!piece) {
           line += " ";
         } else {
-          line += s.piece.unicodeChar;
+          line += piece.unicodeChar;
         }
         line += "|";
       }

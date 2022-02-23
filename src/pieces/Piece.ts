@@ -62,7 +62,7 @@ export default class Piece {
   public move(dst: { rank: number; file: number }, board: Board) {
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
     const hasPiece = board.getPiece(dst.rank, dst.file);
-    if (hasPiece && hasPiece.piece?.type != "King") {
+    if (hasPiece && hasPiece.type != "King") {
       // Piece gets eaten
       board.setPiece(null, dst.rank, dst.file);
     }

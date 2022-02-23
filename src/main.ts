@@ -5,6 +5,7 @@ import Rook from "./pieces/Rook";
 
 const board = new Board();
 board.loadPieces();
-console.log(board.getPiece(0, 0));
-
+board.movePiece({ rank: 3, file: 7 }, board.getPiece(1, 7));
+board.displayInConsole();
+board.setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 board.displayInConsole();
