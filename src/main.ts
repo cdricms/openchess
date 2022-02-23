@@ -6,5 +6,5 @@ import Rook from "./pieces/Rook";
 const board = new Board();
 board.loadPieces();
 console.log(board.getPiece(0, 0));
-console.log(board.splitFEN());
+
 board.displayInConsole();

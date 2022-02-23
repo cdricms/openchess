@@ -18,59 +18,55 @@ export default class Board {
   }
 
   public loadPieces() {
-    const splitted = this.splitFEN();
-    for (let rank = splitted.length - 1; rank >= 0; rank--) {
-      for (let file = 0; file < splitted[rank].length; file++) {
-        const value = splitted[rank][file];
+    let rank = 0;
+    let file = 0;
+    let iFEN = 0;
 
+    while (rank < this.board.length) {
+      const char = this.fen[iFEN];
+      const parsed = parseInt(char);
+
+      if (char === "/") {
+        rank++;
+        file = 0;
+      } else if (isNaN(parsed)) {
         let piece: Piece | null = null;
-        switch (value as FENPieceNotation) {
+        switch (char as FENPieceNotation) {
           case "K":
           case "k":
-            piece = new King(value === "k" ? "dark" : "light");
+            piece = new King(char === "k" ? "dark" : "light");
             break;
           case "Q":
           case "q":
-            piece = new Queen(value === "q" ? "dark" : "light");
+            piece = new Queen(char === "q" ? "dark" : "light");
             break;
           case "R":
           case "r":
-            piece = new Rook(value === "q" ? "dark" : "light");
+            piece = new Rook(char === "q" ? "dark" : "light");
             break;
           case "N":
           case "n":
-            piece = new Knight(value === "n" ? "dark" : "light");
+            piece = new Knight(char === "n" ? "dark" : "light");
             break;
           case "B":
           case "b":
-            piece = new Bishop(value === "b" ? "dark" : "light");
+            piece = new Bishop(char === "b" ? "dark" : "light");
             break;
           case "P":
           case "p":
-            piece = new Pawn(value === "p" ? "dark" : "light");
+            piece = new Pawn(char === "p" ? "dark" : "light");
             break;
         }
+        console.log(file);
+        this.board[rank][file].piece = piece;
+        if (piece) piece.pos = this.board[rank][file].pos;
 
-        this.setPiece(piece, rank, file);
+        file++;
+      } else {
+        file += parsed;
       }
+      iFEN++;
     }
-  }
-
-  public splitFEN() {
-    const splitted: ((string | null)[] | string)[] = this.fen.split("/");
-    for (let str = 0; str < splitted.length; str++) {
-      const result = [];
-      for (const char of splitted[str]!) {
-        const parsed = parseInt(char as string);
-        if (isNaN(parsed)) {
-          result.push(char);
-        } else {
-          result.push(...Array(parsed).fill(null));
-        }
-      }
-      splitted[str] = result;
-    }
-    return splitted;
   }
 
   public generateFEN() {
