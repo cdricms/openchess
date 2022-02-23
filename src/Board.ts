@@ -51,7 +51,10 @@ export default class Board {
     this.board = this.generateBoard();
   }
 
-  public loadPieces() {
+  public loadPieces(fen?: string) {
+    if (fen && this.legalFEN(fen)) {
+      this.fen = fen;
+    }
     let rank = this.board.length - 1;
     let file = 0;
     let iFEN = 0;
