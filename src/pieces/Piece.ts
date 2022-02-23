@@ -3,10 +3,11 @@ import { FENPieceNotation, PiecesUnicode, PieceType, Shade } from "../common";
 
 export default class Piece {
   protected type: PieceType;
-  protected shade: Shade;
+  readonly shade: Shade;
   pos?: { rank: number; file: number };
   readonly unicodeChar: PiecesUnicode;
   readonly fenChar: FENPieceNotation;
+  public timesMoved: number = 0;
 
   constructor(
     type: PieceType,
@@ -20,6 +21,8 @@ export default class Piece {
     this.unicodeChar = unicode;
     this.fenChar = fenChar;
   }
+
+  public getLegalMoves(board: Board) {}
 
   private getUnicodeAndFENChar(): {
     unicode: PiecesUnicode;
