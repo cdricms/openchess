@@ -9,7 +9,7 @@ export default class Piece {
   readonly fenChar: FENPieceNotation;
   public timesMoved: number = 0;
 
-  constructor(
+  protected constructor(
     type: PieceType,
     shade: Shade,
     pos?: { rank: number; file: number }
@@ -22,6 +22,7 @@ export default class Piece {
     this.fenChar = fenChar;
   }
 
+  public getDefaultMoves(board: Board) {}
   public getLegalMoves(board: Board) {}
 
   private getUnicodeAndFENChar(): {
@@ -71,5 +72,6 @@ export default class Piece {
     }
 
     board.setPiece(this, dst.rank, dst.file);
+    this.timesMoved++;
   }
 }

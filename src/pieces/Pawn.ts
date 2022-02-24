@@ -1,5 +1,6 @@
 import Board from "../Board";
 import { Shade } from "../common";
+import Square from "../Square";
 import Piece from "./Piece";
 
 export default class Pawn extends Piece {
@@ -8,6 +9,33 @@ export default class Pawn extends Piece {
   }
 
   public getLegalMoves(board: Board) {
+    const moves = this.getDefaultMoves(board);
+    const lMoves: (Square | null)[] = [];
+    moves.forEach((m) => {
+      if (m && this.checkMoveLegality(m)) {
+        lMoves.push(m);
+      }
+    });
+    return lMoves;
+  }
+
+  public checkMoveLegality(move: Square) {
+    let isLegal = false;
+    if (!move.piece) {
+      isLegal = true;
+    } else {
+      isLegal = false;
+      if (move.piece.shade !== this.shade) {
+        isLegal = true;
+      } else {
+        false;
+      }
+    }
+    return isLegal;
+  }
+
+  public getDefaultMoves(board: Board) {
+    const moves = [];
     if (this.pos) {
       const sign = this.shade === "light" ? 1 : -1;
       const frontSquare = board.getSquare(this.pos.rank + sign, this.pos.file);
@@ -25,14 +53,18 @@ export default class Pawn extends Piece {
       );
 
       if (!frontSquare?.piece) {
+        moves.push(frontSquare);
       } // 1 square move
       if (this.timesMoved === 0 && !front2Square?.piece) {
+        moves.push(front2Square);
       } // 2 square move
-
-      if (upRightSqu?.piece && upRightSqu.piece.shade !== this.shade) {
+      if (upRightSqu) {
+        moves.push(upRightSqu);
       }
-      if (upLeftSquare?.piece && upLeftSquare.piece.shade !== this.shade) {
+      if (upLeftSquare) {
+        moves.push(upLeftSquare);
       }
     }
+    return moves;
   }
 }

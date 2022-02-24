@@ -10,20 +10,20 @@ import Pawn from "./pieces/Pawn";
 
 export default class Board {
   board: Square[][];
-  private fen: string;
+  private _fen: string;
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
     this.board = this.generateBoard();
-    this.fen = fen;
+    this._fen = fen;
   }
 
-  public getFen() {
-    return this.fen;
+  public get fen() {
+    return this._fen;
   }
 
-  public setFen(fen: string) {
+  public set fen(fen: string) {
     if (this.legalFEN(fen)) {
-      this.fen = fen;
+      this._fen = fen;
       this.emptyBoard();
       this.loadPieces();
     }
@@ -173,7 +173,7 @@ export default class Board {
     this.board[rank][file].piece = piece;
     if (piece) piece.pos = this.board[rank][file].pos;
 
-    this.fen = this.generateFEN();
+    this._fen = this.generateFEN();
 
     return true;
   }

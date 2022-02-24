@@ -5,7 +5,11 @@ import Rook from "./pieces/Rook";
 
 const board = new Board();
 board.loadPieces();
-board.movePiece({ rank: 3, file: 7 }, board.getPiece(1, 7));
 board.displayInConsole();
-board.setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+const pawn = board.getPiece(1, 7);
+console.log(pawn?.getLegalMoves(board));
+board.movePiece({ rank: 3, file: 7 }, pawn);
+board.displayInConsole();
+console.log(pawn?.getDefaultMoves(board));
+board.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 board.displayInConsole();
