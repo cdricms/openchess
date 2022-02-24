@@ -1,5 +1,6 @@
 import Board from "../Board";
 import { FENPieceNotation, PiecesUnicode, PieceType, Shade } from "../common";
+import Square from "../Square";
 
 export default class Piece {
   protected type: PieceType;
@@ -7,11 +8,14 @@ export default class Piece {
   pos?: { rank: number; file: number };
   readonly unicodeChar: PiecesUnicode;
   readonly fenChar: FENPieceNotation;
-  public timesMoved: number = 0;
+  timesMoved: number = 0;
+  defaultMoves: Square[] = [];
+  legalMoves: Square[] = [];
 
   protected constructor(
     type: PieceType,
     shade: Shade,
+    board: Board,
     pos?: { rank: number; file: number }
   ) {
     this.type = type;
@@ -20,10 +24,43 @@ export default class Piece {
     const { unicode, fenChar } = this.getUnicodeAndFENChar();
     this.unicodeChar = unicode;
     this.fenChar = fenChar;
+    this.defaultMoves = this.getDefaultMoves(board);
+    this.legalMoves = this.getLegalMoves(board);
   }
 
-  public getDefaultMoves(board: Board) {}
-  public getLegalMoves(board: Board) {}
+  public getDefaultMoves(board: Board): Square[] {
+    return [];
+  }
+  public getLegalMoves(board: Board): Square[] {
+    return [];
+  }
+  protected moveConditions(m: Square): boolean {
+    return false;
+  }
+
+  protected isMoveLegal(m: Square): boolean {
+    return this.legalMoves.includes(m);
+  }
+
+  protected checkMoveLegality(move: Square, callback?: () => boolean) {
+    let isLegal = false;
+    if (!move.piece) {
+      isLegal = true;
+    } else {
+      isLegal = false;
+      if (move.piece.shade !== this.shade) {
+        isLegal = true;
+      } else {
+        isLegal = false;
+      }
+    }
+
+    if (callback) {
+      isLegal = callback();
+    }
+
+    return isLegal;
+  }
 
   private getUnicodeAndFENChar(): {
     unicode: PiecesUnicode;
@@ -64,8 +101,11 @@ export default class Piece {
   }
 
   public move(dst: { rank: number; file: number }, board: Board) {
+    const s = board.getSquare(dst.rank, dst.file);
+    if (!s) return;
+    if (s && !this.isMoveLegal(s)) return;
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
-    const hasPiece = board.getPiece(dst.rank, dst.file);
+    const hasPiece = s?.piece;
     if (hasPiece && hasPiece.type != "King") {
       // Piece gets eaten
       board.setPiece(null, dst.rank, dst.file);
@@ -73,5 +113,7 @@ export default class Piece {
 
     board.setPiece(this, dst.rank, dst.file);
     this.timesMoved++;
+    this.defaultMoves = this.getDefaultMoves(board);
+    this.legalMoves = this.getLegalMoves(board);
   }
 }

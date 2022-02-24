@@ -71,32 +71,36 @@ export default class Board {
         switch (char as FENPieceNotation) {
           case "K":
           case "k":
-            piece = new King(char === "k" ? "dark" : "light");
+            piece = new King(char === "k" ? "dark" : "light", this);
             break;
           case "Q":
           case "q":
-            piece = new Queen(char === "q" ? "dark" : "light");
+            piece = new Queen(char === "q" ? "dark" : "light", this);
             break;
           case "R":
           case "r":
-            piece = new Rook(char === "r" ? "dark" : "light");
+            piece = new Rook(char === "r" ? "dark" : "light", this);
             break;
           case "N":
           case "n":
-            piece = new Knight(char === "n" ? "dark" : "light");
+            piece = new Knight(char === "n" ? "dark" : "light", this);
             break;
           case "B":
           case "b":
-            piece = new Bishop(char === "b" ? "dark" : "light");
+            piece = new Bishop(char === "b" ? "dark" : "light", this);
             break;
           case "P":
           case "p":
-            piece = new Pawn(char === "p" ? "dark" : "light");
+            piece = new Pawn(char === "p" ? "dark" : "light", this);
             break;
         }
 
         this.board[rank][file].piece = piece;
-        if (piece) piece.pos = this.board[rank][file].pos;
+        if (piece) {
+          piece.pos = this.board[rank][file].pos;
+          piece.defaultMoves = piece.getDefaultMoves(this);
+          piece.legalMoves = piece.getLegalMoves(this);
+        }
 
         file++;
       } else {
