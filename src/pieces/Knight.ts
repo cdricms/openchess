@@ -53,7 +53,4 @@ export default class Knight extends Piece {
 
     return lMoves;
   }
-  protected moveConditions(m: Square): boolean {
-    return false;
-  }
 }
