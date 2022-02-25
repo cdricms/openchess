@@ -15,15 +15,21 @@ export default class Knight extends Piece {
   public getDefaultMoves(board: Board): Square[] {
     const moves: Square[] = [];
     if (this.pos) {
-      // for (let i = 0; i < 4; i++) {
-      //   const s1 = board.getSquare(this.pos.rank, this.pos.file);
-      //   const s2 = board.getSquare(this.pos.rank, this.pos.file);
-      //   if (s1) moves.push(s1);
-      //   if (s2) moves.push(s2);
-      // }
-
       /// THIS HAS TO BE BETTER
 
+      // const a = [-2, -1, 1, 2];
+      // for (let rank of a) {
+      //   for (let file of a) {
+      //     if (rank !== file) {
+      //       const s = board.getSquare(
+      //         this.pos.rank + rank,
+      //         this.pos.file + file
+      //       );
+      //       console.log(rank, file);
+      //       if (s) moves.push(s);
+      //     }
+      //   }
+      // }
       const topRight = board.getSquare(this.pos.rank + 2, this.pos.file + 1);
       const topLeft = board.getSquare(this.pos.rank + 2, this.pos.file - 1);
       const bottomRight = board.getSquare(this.pos.rank - 2, this.pos.file + 1);
