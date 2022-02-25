@@ -25,14 +25,14 @@ export default class Piece {
     this.unicodeChar = unicode;
     this.fenChar = fenChar;
     this.defaultMoves = this.getDefaultMoves(board);
-    this.legalMoves = this.getLegalMoves(board);
+    this.legalMoves = this.getLegalMoves();
   }
 
   public getDefaultMoves(board: Board): Square[] {
     return [];
   }
-  public getLegalMoves(board: Board): Square[] {
-    return [];
+  public getLegalMoves(): Square[] {
+    return this.defaultMoves;
   }
   protected moveConditions(m: Square): boolean {
     return false;
@@ -114,6 +114,6 @@ export default class Piece {
     board.setPiece(this, dst.rank, dst.file);
     this.timesMoved++;
     this.defaultMoves = this.getDefaultMoves(board);
-    this.legalMoves = this.getLegalMoves(board);
+    this.legalMoves = this.getLegalMoves();
   }
 }

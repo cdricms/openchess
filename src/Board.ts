@@ -59,6 +59,7 @@ export default class Board {
     let file = 0;
     let iFEN = 0;
     let char = "";
+    const pieces: Piece[] = [];
 
     while (rank >= 0 && (char = this.fen[iFEN])) {
       const parsed = parseInt(char);
@@ -98,8 +99,7 @@ export default class Board {
         this.board[rank][file].piece = piece;
         if (piece) {
           piece.pos = this.board[rank][file].pos;
-          piece.defaultMoves = piece.getDefaultMoves(this);
-          piece.legalMoves = piece.getLegalMoves(this);
+          pieces.push(piece);
         }
 
         file++;
@@ -108,6 +108,11 @@ export default class Board {
       }
       iFEN++;
     }
+
+    pieces.forEach((piece) => {
+      piece.defaultMoves = piece.getDefaultMoves(this);
+      piece.legalMoves = piece.getLegalMoves();
+    });
   }
 
   public generateFEN() {

@@ -12,8 +12,8 @@ export default class Pawn extends Piece {
     super("Pawn", shade, board, pos);
   }
 
-  public getLegalMoves(board: Board) {
-    const moves = this.getDefaultMoves(board);
+  public getLegalMoves() {
+    const moves = this.defaultMoves;
     const lMoves: Square[] = [];
     moves.forEach((m) => {
       if (m && this.checkMoveLegality(m, () => this.moveConditions(m))) {
