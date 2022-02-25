@@ -11,38 +11,24 @@ export default class Knight extends Piece {
   public getDefaultMoves(board: Board): Square[] {
     const moves: Square[] = [];
     if (this.pos) {
-      /// THIS HAS TO BE BETTER
+      const p: Array<[number, number]> = [
+        [2, 1],
+        [2, -1],
+        [-2, 1],
+        [-2, -1],
+        [1, 2],
+        [1, -2],
+        [-1, 2],
+        [-1, -2]
+      ];
 
-      // const a = [-2, -1, 1, 2];
-      // for (let rank of a) {
-      //   for (let file of a) {
-      //     if (rank !== file) {
-      //       const s = board.getSquare(
-      //         this.pos.rank + rank,
-      //         this.pos.file + file
-      //       );
-      //       console.log(rank, file);
-      //       if (s) moves.push(s);
-      //     }
-      //   }
-      // }
-      const topRight = board.getSquare(this.pos.rank + 2, this.pos.file + 1);
-      const topLeft = board.getSquare(this.pos.rank + 2, this.pos.file - 1);
-      const bottomRight = board.getSquare(this.pos.rank - 2, this.pos.file + 1);
-      const bottomLeft = board.getSquare(this.pos.rank - 2, this.pos.file - 1);
-      const tR = board.getSquare(this.pos.rank + 1, this.pos.file + 2);
-      const tL = board.getSquare(this.pos.rank + 1, this.pos.file - 2);
-      const bR = board.getSquare(this.pos.rank - 1, this.pos.file + 2);
-      const bL = board.getSquare(this.pos.rank - 1, this.pos.file - 2);
-
-      if (topRight) moves.push(topRight);
-      if (topLeft) moves.push(topLeft);
-      if (bottomLeft) moves.push(bottomLeft);
-      if (bottomRight) moves.push(bottomRight);
-      if (tR) moves.push(tR);
-      if (tL) moves.push(tL);
-      if (bR) moves.push(bR);
-      if (bL) moves.push(bL);
+      p.forEach((pos) => {
+        const s = board.getSquare(
+          this.pos!.rank + pos[0],
+          this.pos!.file + pos[1]
+        );
+        if (s) moves.push(s);
+      });
     }
     return moves;
   }

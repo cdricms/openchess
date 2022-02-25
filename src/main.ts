@@ -3,10 +3,12 @@ import Bishop from "./pieces/Bishop";
 import Queen from "./pieces/Queen";
 import Rook from "./pieces/Rook";
 
-const board = new Board("rnb1kbnr/pppppppp/8/8/3q4/8/PPPPPPPP/RNBQKBNR");
+const board = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 board.loadPieces();
 board.displayInConsole();
 // const pawn = board.getPiece(1, 4);
+// const knight = board.getPiece(7, 1);
+// console.table(knight?.defaultMoves);
 // const e = board.getPiece(6, 1);
 // const rook = board.getPiece(3, 3);
 // console.table(bishop?.legalMoves);
@@ -19,6 +21,6 @@ board.displayInConsole();
 // // board.fen = "rnbqkbnr/pppp1ppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 // board.displayInConsole();
 
-const king = board.getPiece(7, 4);
-console.log(king?.type);
-console.table(king?.defaultMoves);
+// const king = board.getPiece(7, 4);
+// console.log(king?.type);
+// console.table(king?.defaultMoves);
