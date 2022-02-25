@@ -1,3 +1,11 @@
+import Piece from "./pieces/Piece";
+import Square from "./Square";
+
+export interface Position {
+  rank: number;
+  file: number;
+}
+
 export type Shade = "dark" | "light";
 export type PieceType =
   | "Pawn"
@@ -36,3 +44,19 @@ export type FENPieceNotation =
   | "B"
   | "Q"
   | "K";
+
+export function checkLegalMoves(this: Piece, line: Square[]) {
+  const l: Square[] = [];
+  for (const s of line) {
+    if (!s.piece) {
+      // /// May cause some bugs, need to be careful
+      // s.isPinned = s.isPinned ? null : this.shade;
+      l.push(s);
+    } else if (s.piece.shade !== this.shade) {
+      l.push(s);
+      break;
+    } else break;
+  }
+
+  return l;
+}

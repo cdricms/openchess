@@ -1,11 +1,17 @@
 import Board from "../Board";
-import { FENPieceNotation, PiecesUnicode, PieceType, Shade } from "../common";
+import {
+  FENPieceNotation,
+  PiecesUnicode,
+  PieceType,
+  Position,
+  Shade
+} from "../common";
 import Square from "../Square";
 
 export default class Piece {
-  protected type: PieceType;
+  readonly type: PieceType;
   readonly shade: Shade;
-  pos?: { rank: number; file: number };
+  pos?: Position;
   readonly unicodeChar: PiecesUnicode;
   readonly fenChar: FENPieceNotation;
   timesMoved: number = 0;
@@ -16,7 +22,7 @@ export default class Piece {
     type: PieceType,
     shade: Shade,
     board: Board,
-    pos?: { rank: number; file: number }
+    pos?: Position
   ) {
     this.type = type;
     this.shade = shade;
@@ -25,13 +31,13 @@ export default class Piece {
     this.unicodeChar = unicode;
     this.fenChar = fenChar;
     this.defaultMoves = this.getDefaultMoves(board);
-    this.legalMoves = this.getLegalMoves();
+    this.legalMoves = this.getLegalMoves(board);
   }
 
   public getDefaultMoves(board: Board): Square[] {
     return [];
   }
-  public getLegalMoves(): Square[] {
+  public getLegalMoves(board: Board): Square[] {
     return this.defaultMoves;
   }
   protected moveConditions(m: Square): boolean {
@@ -114,6 +120,6 @@ export default class Piece {
     board.setPiece(this, dst.rank, dst.file);
     this.timesMoved++;
     this.defaultMoves = this.getDefaultMoves(board);
-    this.legalMoves = this.getLegalMoves();
+    this.legalMoves = this.getLegalMoves(board);
   }
 }

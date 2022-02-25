@@ -1,18 +1,14 @@
 import Board from "../Board";
-import { Shade } from "../common";
+import { Position, Shade } from "../common";
 import Square from "../Square";
 import Piece from "./Piece";
 
 export default class Pawn extends Piece {
-  constructor(
-    shade: Shade,
-    board: Board,
-    pos?: { rank: number; file: number }
-  ) {
+  constructor(shade: Shade, board: Board, pos?: Position) {
     super("Pawn", shade, board, pos);
   }
 
-  public getLegalMoves() {
+  public getLegalMoves(_: Board) {
     const moves = this.defaultMoves;
     const lMoves: Square[] = [];
     moves.forEach((m) => {

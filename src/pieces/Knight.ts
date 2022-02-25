@@ -1,14 +1,10 @@
 import Board from "../Board";
-import { Shade } from "../common";
+import { Position, Shade } from "../common";
 import Square from "../Square";
 import Piece from "./Piece";
 
 export default class Knight extends Piece {
-  constructor(
-    shade: Shade,
-    board: Board,
-    pos?: { rank: number; file: number }
-  ) {
+  constructor(shade: Shade, board: Board, pos?: Position) {
     super("Knight", shade, board, pos);
   }
 
@@ -50,7 +46,7 @@ export default class Knight extends Piece {
     }
     return moves;
   }
-  public getLegalMoves(): Square[] {
+  public getLegalMoves(_: Board): Square[] {
     const moves = this.defaultMoves;
     const lMoves: Square[] = [];
     moves.forEach((m) => {

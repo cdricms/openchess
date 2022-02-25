@@ -1,7 +1,7 @@
 import Piece from "./pieces/Piece";
 import Rook from "./pieces/Rook";
 import Square from "./Square";
-import { FENPieceNotation } from "./common";
+import { FENPieceNotation, Position } from "./common";
 import Bishop from "./pieces/Bishop";
 import King from "./pieces/King";
 import Queen from "./pieces/Queen";
@@ -11,6 +11,7 @@ import Pawn from "./pieces/Pawn";
 export default class Board {
   board: Square[][];
   private _fen: string;
+  private pieces: Piece[] = [];
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
     this.board = this.generateBoard();
@@ -99,6 +100,8 @@ export default class Board {
         this.board[rank][file].piece = piece;
         if (piece) {
           piece.pos = this.board[rank][file].pos;
+          // piece.defaultMoves = piece.getDefaultMoves(this);
+          // piece.legalMoves = piece.getLegalMoves(this);
           pieces.push(piece);
         }
 
@@ -109,9 +112,11 @@ export default class Board {
       iFEN++;
     }
 
+    this.pieces = pieces;
+
     pieces.forEach((piece) => {
       piece.defaultMoves = piece.getDefaultMoves(this);
-      piece.legalMoves = piece.getLegalMoves();
+      piece.legalMoves = piece.getLegalMoves(this);
     });
   }
 
@@ -198,8 +203,14 @@ export default class Board {
     return this.board[rank][file];
   }
 
-  public movePiece(dst: { rank: number; file: number }, piece: Piece | null) {
-    if (piece) piece.move(dst, this);
+  public movePiece(dst: Position, piece: Piece | null) {
+    if (piece) {
+      piece.move(dst, this);
+      this.pieces.forEach((p) => {
+        p.defaultMoves = p.getDefaultMoves(this);
+        p.legalMoves = p.getLegalMoves(this);
+      });
+    }
   }
 
   public displayInConsole() {

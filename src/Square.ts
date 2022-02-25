@@ -6,6 +6,7 @@ export default class Square {
   protected shade: Shade;
   public readonly pos: { rank: number; file: number };
   protected readonly chessPosition: { rank: number; file: string };
+  public isPinned: Shade | null = null;
 
   constructor(shade: Shade, pos: { rank: number; file: number }) {
     this.shade = shade;
