@@ -17,6 +17,8 @@ export default class Piece {
   timesMoved: number = 0;
   defaultMoves: Square[] = [];
   legalMoves: Square[] = [];
+  threatens: Set<Piece> = new Set();
+  threatenedBy: Set<Piece> = new Set();
 
   protected constructor(
     type: PieceType,
@@ -38,7 +40,7 @@ export default class Piece {
     return [];
   }
   public getLegalMoves(board: Board): Square[] {
-    return this.defaultMoves;
+    return [];
   }
   protected moveConditions(m: Square): boolean {
     return false;
@@ -46,6 +48,15 @@ export default class Piece {
 
   protected isMoveLegal(m: Square): boolean {
     return this.legalMoves.includes(m);
+  }
+
+  public threat() {
+    this.legalMoves.forEach((m) => {
+      if (m.piece && m.piece.shade !== this.shade) {
+        this.threatens.add(m.piece);
+        m.piece.threatenedBy.add(this);
+      }
+    });
   }
 
   protected checkMoveLegality(move: Square, callback?: () => boolean) {
@@ -106,20 +117,18 @@ export default class Piece {
     }
   }
 
-  public move(dst: { rank: number; file: number }, board: Board) {
+  public move(dst: Position, board: Board) {
     const s = board.getSquare(dst.rank, dst.file);
     if (!s) return;
     if (s && !this.isMoveLegal(s)) return;
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
     const hasPiece = s?.piece;
-    if (hasPiece && hasPiece.type != "King") {
+    if (hasPiece && hasPiece.type !== "King") {
       // Piece gets eaten
       board.setPiece(null, dst.rank, dst.file);
     }
 
     board.setPiece(this, dst.rank, dst.file);
     this.timesMoved++;
-    this.defaultMoves = this.getDefaultMoves(board);
-    this.legalMoves = this.getLegalMoves(board);
   }
 }

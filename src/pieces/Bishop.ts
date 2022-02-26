@@ -39,4 +39,4 @@ export default class Bishop extends Piece {
   }
 }
 
-Object.assign(Bishop.prototype, { diagonalMove, check: checkLegalMoves });
+Object.assign(Bishop.prototype, { diagonalMove, checkLegalMoves });

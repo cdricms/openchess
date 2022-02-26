@@ -47,4 +47,4 @@ export default class Rook extends Piece {
   }
 }
 
-Object.assign(Rook.prototype, { straightMove, check: checkLegalMoves });
+Object.assign(Rook.prototype, { straightMove, checkLegalMoves });

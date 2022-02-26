@@ -1,17 +1,22 @@
 import Piece from "./pieces/Piece";
 import Rook from "./pieces/Rook";
 import Square from "./Square";
-import { FENPieceNotation, Position } from "./common";
+import { FENPieceNotation, Position, Shade } from "./common";
 import Bishop from "./pieces/Bishop";
 import King from "./pieces/King";
 import Queen from "./pieces/Queen";
 import Knight from "./pieces/Knight";
 import Pawn from "./pieces/Pawn";
+import { difference } from "lodash";
 
 export default class Board {
   board: Square[][];
   private _fen: string;
-  private pieces: Piece[] = [];
+  public pieces: Piece[] = [];
+  public lightKing: King | null = null;
+  public darkKing: King | null = null;
+  public darkCoverage: Set<Square> = new Set();
+  public lightCoverage: Set<Square> = new Set();
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
     this.board = this.generateBoard();
@@ -60,7 +65,6 @@ export default class Board {
     let file = 0;
     let iFEN = 0;
     let char = "";
-    const pieces: Piece[] = [];
 
     while (rank >= 0 && (char = this.fen[iFEN])) {
       const parsed = parseInt(char);
@@ -72,8 +76,10 @@ export default class Board {
         let piece: Piece | null = null;
         switch (char as FENPieceNotation) {
           case "K":
+            this.lightKing = piece = new King("light", this);
+            break;
           case "k":
-            piece = new King(char === "k" ? "dark" : "light", this);
+            this.darkKing = piece = new King("dark", this);
             break;
           case "Q":
           case "q":
@@ -100,9 +106,7 @@ export default class Board {
         this.board[rank][file].piece = piece;
         if (piece) {
           piece.pos = this.board[rank][file].pos;
-          // piece.defaultMoves = piece.getDefaultMoves(this);
-          // piece.legalMoves = piece.getLegalMoves(this);
-          pieces.push(piece);
+          this.pieces.push(piece);
         }
 
         file++;
@@ -112,12 +116,38 @@ export default class Board {
       iFEN++;
     }
 
-    this.pieces = pieces;
+    this.getCoverage();
+  }
 
-    pieces.forEach((piece) => {
-      piece.defaultMoves = piece.getDefaultMoves(this);
-      piece.legalMoves = piece.getLegalMoves(this);
+  public getKing(shade: Shade): King | null {
+    const p: King | undefined = this.pieces.find(
+      (p) => p.shade === shade && p.type === "King"
+    );
+    return p ? p : null;
+  }
+
+  private getCoverage() {
+    this.lightCoverage.clear();
+    this.darkCoverage.clear();
+    this.pieces.forEach((p) => {
+      p.threatenedBy.clear();
+      p.threatens.clear();
     });
+    this.pieces.forEach((p) => {
+      p.defaultMoves = p.getDefaultMoves(this);
+      p.legalMoves = p.getLegalMoves(this);
+      p.threat();
+      if (p.shade === "light") {
+        p.legalMoves.forEach((m) => this.lightCoverage.add(m));
+      } else {
+        p.legalMoves.forEach((m) => this.darkCoverage.add(m));
+      }
+    });
+
+    if (this.darkKing)
+      this.darkKing.legalMoves = this.darkKing.getLegalMoves(this);
+    if (this.lightKing)
+      this.lightKing.legalMoves = this.lightKing.getLegalMoves(this);
   }
 
   public generateFEN() {
@@ -206,10 +236,11 @@ export default class Board {
   public movePiece(dst: Position, piece: Piece | null) {
     if (piece) {
       piece.move(dst, this);
-      this.pieces.forEach((p) => {
-        p.defaultMoves = p.getDefaultMoves(this);
-        p.legalMoves = p.getLegalMoves(this);
-      });
+      this.getCoverage();
+      // this.pieces.forEach((piece) => {
+      //   piece.defaultMoves = piece.getDefaultMoves(this);
+      //   piece.legalMoves = piece.getLegalMoves(this);
+      // });
     }
   }
 

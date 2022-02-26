@@ -9,6 +9,18 @@ export default class King extends Piece {
     super("King", shade, board, pos);
   }
 
+  public getLegalMoves(board: Board): Square[] {
+    const enCoverage =
+      this.shade === "dark" ? board.lightCoverage : board.darkCoverage;
+    const lMoves: Square[] = [];
+    this.defaultMoves.forEach((m) => {
+      if (m && this.checkMoveLegality(m) && !enCoverage.has(m)) {
+        lMoves.push(m);
+      }
+    });
+    return lMoves;
+  }
+
   public getDefaultMoves(board: Board): Square[] {
     const moves: Square[] = [];
     const dir: DirectionString[] = [

@@ -49,8 +49,6 @@ export function checkLegalMoves(this: Piece, line: Square[]) {
   const l: Square[] = [];
   for (const s of line) {
     if (!s.piece) {
-      // /// May cause some bugs, need to be careful
-      // s.isPinned = s.isPinned ? null : this.shade;
       l.push(s);
     } else if (s.piece.shade !== this.shade) {
       l.push(s);

@@ -65,5 +65,5 @@ export default class Queen extends Piece {
 Object.assign(Queen.prototype, {
   diagonalMove,
   straightMove,
-  check: checkLegalMoves
+  checkLegalMoves
 });
