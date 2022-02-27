@@ -10,26 +10,29 @@ import Pawn from "./pieces/Pawn";
 
 export default class Board {
   board: Square[][];
-  private _fen: string;
+  #_fen: string;
   public pieces: Piece[] = [];
   public lightKing: King | null = null;
   public darkKing: King | null = null;
   public darkCoverage: Set<Square> = new Set();
   public lightCoverage: Set<Square> = new Set();
   public pieceHistory: Map<string, number> = new Map();
+  public totalMoves = 0;
+  public whoWon: Shade | null = null;
+  public history: { uuid: string }[] = [];
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
-    this.board = this.generateBoard();
-    this._fen = fen;
+    this.board = this.#generateBoard();
+    this.#_fen = fen;
   }
 
   public get fen() {
-    return this._fen;
+    return this.#_fen;
   }
 
   public set fen(fen: string) {
     if (this.legalFEN(fen)) {
-      this._fen = fen;
+      this.#_fen = fen;
       this.emptyBoard();
       this.loadPieces();
     }
@@ -54,7 +57,7 @@ export default class Board {
   }
 
   public emptyBoard() {
-    this.board = this.generateBoard();
+    this.board = this.#generateBoard();
   }
 
   public loadPieces(fen?: string) {
@@ -117,7 +120,7 @@ export default class Board {
       iFEN++;
     }
 
-    this.scan();
+    this.#scan();
   }
 
   public getKing(shade: Shade): King | null {
@@ -127,12 +130,14 @@ export default class Board {
     return p ? p : null;
   }
 
-  private scan() {
+  #scan() {
     this.lightCoverage.clear();
     this.darkCoverage.clear();
     this.pieces.forEach((p) => {
       p.threatenedBy.clear();
       p.threatens.clear();
+      p.protects.clear();
+      p.protectedBy.clear();
       p.myKingIsUnderCheck = false;
     });
     this.pieces.forEach((p) => {
@@ -148,20 +153,35 @@ export default class Board {
 
     if (this.darkKing) {
       this.darkKing.legalMoves = this.darkKing.getLegalMoves(this);
-      if (this.darkKing.isUnderCheck) this.signalKingUnderCheck(this.darkKing);
+      if (this.darkKing.isUnderCheck) {
+        this.#signalKingUnderCheck(this.darkKing);
+      }
     }
     if (this.lightKing) {
       this.lightKing.legalMoves = this.lightKing.getLegalMoves(this);
-      if (this.lightKing.isUnderCheck)
-        this.signalKingUnderCheck(this.lightKing);
+      if (this.lightKing.isUnderCheck) {
+      }
+      this.#signalKingUnderCheck(this.lightKing);
     }
+    if (this.darkCoverage.size === 0) this.whoWon = "light";
+    if (this.lightCoverage.size === 0) this.whoWon = "dark";
   }
 
-  signalKingUnderCheck(king: King) {
+  #signalKingUnderCheck(king: King) {
+    const cov = king.shade === "dark" ? this.darkCoverage : this.lightCoverage;
+
     this.pieces.forEach((p) => {
       if (p.shade === king.shade && p.type !== "King") {
         p.myKingIsUnderCheck = true;
         p.findMovesToProtectKing(this);
+      }
+    });
+    cov.clear();
+    this.pieces.forEach((p) => {
+      if (p.shade === king.shade) {
+        p.legalMoves.forEach((m) => {
+          cov.add(m);
+        });
       }
     });
   }
@@ -192,7 +212,7 @@ export default class Board {
     return fen;
   }
 
-  private generateBoard() {
+  #generateBoard() {
     const board: Square[][] = new Array(8);
     for (let rank = 0; rank < board.length; rank++) board[rank] = new Array(8);
 
@@ -218,7 +238,7 @@ export default class Board {
     }
   }
 
-  private isInRange(file: number, rank: number) {
+  #isInRange(file: number, rank: number) {
     return (
       0 <= rank &&
       rank < this.board.length &&
@@ -228,12 +248,12 @@ export default class Board {
   }
 
   public setPiece(piece: Piece | null, rank: number, file: number) {
-    if (!this.isInRange(rank, file)) return false;
+    if (!this.#isInRange(rank, file)) return false;
 
     this.board[rank][file].piece = piece;
     if (piece) piece.pos = this.board[rank][file].pos;
 
-    this._fen = this.generateFEN();
+    this.#_fen = this.generateFEN();
 
     return true;
   }
@@ -244,7 +264,7 @@ export default class Board {
   }
 
   public getSquare(rank: number, file: number) {
-    if (!this.isInRange(rank, file)) return null;
+    if (!this.#isInRange(rank, file)) return null;
 
     return this.board[rank][file];
   }
@@ -252,11 +272,7 @@ export default class Board {
   public movePiece(dst: Position, piece: Piece | null) {
     if (piece) {
       piece.move(dst, this);
-      this.scan();
-      // this.pieces.forEach((piece) => {
-      //   piece.defaultMoves = piece.getDefaultMoves(this);
-      //   piece.legalMoves = piece.getLegalMoves(this);
-      // });
+      this.#scan();
     }
   }
 

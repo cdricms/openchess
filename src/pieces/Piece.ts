@@ -21,6 +21,7 @@ export default class Piece {
   threatens: Set<Piece> = new Set();
   threatenedBy: Set<Piece> = new Set();
   protects: Set<Piece> = new Set();
+  protectedBy: Set<Piece> = new Set();
   readonly uuid = randomUUID();
   myKingIsUnderCheck: boolean = false;
 
@@ -33,7 +34,7 @@ export default class Piece {
     this.type = type;
     this.shade = shade;
     this.pos = pos;
-    const { unicode, fenChar } = this.getUnicodeAndFENChar();
+    const { unicode, fenChar } = this.#getUnicodeAndFENChar();
     this.unicodeChar = unicode;
     this.fenChar = fenChar;
     this.defaultMoves = this.getDefaultMoves(board);
@@ -103,6 +104,7 @@ export default class Piece {
         } else {
           isLegal = false;
           this.protects.add(s.piece);
+          s.piece.protectedBy.add(this);
         }
       }
 
@@ -121,6 +123,7 @@ export default class Piece {
           break;
         } else {
           this.protects.add(_s.piece);
+          _s.piece.protectedBy.add(this);
           break;
         }
       }
@@ -128,30 +131,7 @@ export default class Piece {
     }
   }
 
-  //   return isLegal;
-  // }
-  // protected checkMoveLegality(move: Square, callback?: () => boolean) {
-  //   let isLegal = false;
-  //   if (!move.piece) {
-  //     isLegal = true;
-  //   } else {
-  //     isLegal = false;
-  //     if (move.piece.shade !== this.shade) {
-  //       isLegal = true;
-  //     } else {
-  //       isLegal = false;
-  //       this.protects.add(move.piece);
-  //     }
-  //   }
-
-  //   if (callback) {
-  //     isLegal = callback();
-  //   }
-
-  //   return isLegal;
-  // }
-
-  private getUnicodeAndFENChar(): {
+  #getUnicodeAndFENChar(): {
     unicode: PiecesUnicode;
     fenChar: FENPieceNotation;
   } {
@@ -203,5 +183,6 @@ export default class Piece {
     board.setPiece(this, dst.rank, dst.file);
     let timesMoved = board.pieceHistory.get(this.uuid);
     board.pieceHistory.set(this.uuid, timesMoved! + 1);
+    board.totalMoves++;
   }
 }

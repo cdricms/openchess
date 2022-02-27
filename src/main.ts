@@ -3,19 +3,22 @@ import Bishop from "./pieces/Bishop";
 import Queen from "./pieces/Queen";
 import Rook from "./pieces/Rook";
 
-const board = new Board("rnb1kbnr/pppp1ppp/8/4Q3/4q3/8/PPPPPPPP/RNB1KBNR");
+const board = new Board("rnb1k2r/pppp1ppp/8/4Q3/8/8/PPPPPPPP/RNB1KBNR");
+// const board = new Board("rnb1kbnr/ppppQppp/8/6B1/4q3/3P4/PPP1PPPP/RN2KBNR");
 board.loadPieces();
 board.displayInConsole();
-const q = board.getPiece(4, 4);
-const b = board.getPiece(7, 5);
-const n = board.getPiece(7, 6);
-if (q) {
-  console.table((q as Queen).pathToEnemyKing);
-}
-console.table(q?.legalMoves);
-console.table(b?.legalMoves);
-console.table(n?.legalMoves);
-console.table(board.getPiece(6, 0)?.legalMoves);
-// console.table(pawn?.legalMoves);
-// board.movePiece({ rank: 2, file: 0 }, pawn);
-// console.table(pawn?.legalMoves);
+console.table(board.darkCoverage);
+console.table(board.lightCoverage);
+const Q = board.getPiece(4, 4);
+const P = board.getPiece(1, 3);
+const B = board.getPiece(0, 2);
+board.movePiece({ rank: 2, file: 3 }, P);
+board.movePiece({ rank: 6, file: 4 }, Q);
+board.movePiece({ rank: 4, file: 6 }, B);
+board.displayInConsole();
+console.table(board.getPiece(7, 5)?.legalMoves);
+console.table(board.getPiece(7, 6)?.legalMoves);
+console.table(board.getPiece(3, 4)?.legalMoves);
+console.table(board.darkKing?.legalMoves);
+console.log(board.fen);
+console.log(board.whoWon);

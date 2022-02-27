@@ -4,7 +4,7 @@ import Piece from "./pieces/Piece";
 export default class Square {
   piece: Piece | null = null;
   protected shade: Shade;
-  public readonly pos: Position;
+  readonly pos: Position;
   protected readonly chessPosition: { rank: number; file: string };
 
   constructor(shade: Shade, pos: Position) {

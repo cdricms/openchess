@@ -68,7 +68,6 @@ export function getPathToEnemyKing(
     }
     if (isThere) {
       this.pathToEnemyKing = line;
-      console.log("hello");
     }
   }
   return line;
