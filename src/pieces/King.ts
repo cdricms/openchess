@@ -21,6 +21,10 @@ export default class King extends Piece {
     return lMoves;
   }
 
+  public get isUnderCheck() {
+    return this.threatenedBy.size > 0;
+  }
+
   public getDefaultMoves(board: Board): Square[] {
     const moves: Square[] = [];
     const dir: DirectionString[] = [

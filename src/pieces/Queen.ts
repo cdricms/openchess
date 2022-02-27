@@ -1,10 +1,16 @@
 import Board from "../Board";
-import { checkLegalMoves, Position, Shade } from "../common";
+import {
+  getPathToEnemyKing,
+  PathToEnemyKing,
+  Position,
+  Shade
+} from "../common";
 import { diagonalMove, Direction, straightMove } from "../commonMovements";
 import Square from "../Square";
 import Piece from "./Piece";
 
-export default class Queen extends Piece {
+export default class Queen extends Piece implements PathToEnemyKing {
+  pathToEnemyKing: Square[] = [];
   constructor(shade: Shade, board: Board, pos?: Position) {
     super("Queen", shade, board, pos);
   }
@@ -27,23 +33,43 @@ export default class Queen extends Piece {
     return [];
   }
 
-  protected checkLegalMoves(line: Square[]): Square[] {
+  public getPathToEnemyKing(board: Board, line: Square[]): Square[] {
     return [];
   }
 
   public getLegalMoves(board: Board): Square[] {
-    const NORTH = this.checkLegalMoves(
-      this.straightMove(Direction.NORTH, board)
+    const NORTH = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.NORTH, board))
     );
-    const EAST = this.checkLegalMoves(this.straightMove(Direction.EAST, board));
-    const SOUTH = this.checkLegalMoves(
-      this.straightMove(Direction.SOUTH, board)
+    const EAST = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.EAST, board))
     );
-    const WEST = this.checkLegalMoves(this.straightMove(Direction.WEST, board));
-    const NE = this.checkLegalMoves(this.diagonalMove(Direction.NE, board));
-    const SE = this.checkLegalMoves(this.diagonalMove(Direction.SE, board));
-    const SW = this.checkLegalMoves(this.diagonalMove(Direction.SW, board));
-    const NW = this.checkLegalMoves(this.diagonalMove(Direction.NW, board));
+    const SOUTH = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.SOUTH, board))
+    );
+    const WEST = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.WEST, board))
+    );
+    const NE = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.NE, board))
+    );
+    const SE = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.SE, board))
+    );
+    const SW = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.SW, board))
+    );
+    const NW = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.NW, board))
+    );
 
     return [...NORTH, ...NE, ...EAST, ...SE, ...SOUTH, ...SW, ...WEST, ...NW];
   }
@@ -65,5 +91,6 @@ export default class Queen extends Piece {
 Object.assign(Queen.prototype, {
   diagonalMove,
   straightMove,
-  checkLegalMoves
+  getPathToEnemyKing
+  // checkLegalMoves
 });

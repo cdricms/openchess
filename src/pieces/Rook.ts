@@ -1,12 +1,21 @@
 import Board from "../Board";
-import { checkLegalMoves, Position, Shade } from "../common";
+import {
+  getPathToEnemyKing,
+  PathToEnemyKing,
+  Position,
+  Shade
+} from "../common";
 import { Direction, straightMove } from "../commonMovements";
 import Square from "../Square";
 import Piece from "./Piece";
 
-export default class Rook extends Piece {
+export default class Rook extends Piece implements PathToEnemyKing {
+  pathToEnemyKing: Square[] = [];
   constructor(shade: Shade, board: Board, pos?: Position) {
     super("Rook", shade, board, pos);
+  }
+  getPathToEnemyKing(board: Board, line: Square[]): Square[] {
+    return [];
   }
 
   protected straightMove(
@@ -20,19 +29,23 @@ export default class Rook extends Piece {
     return [];
   }
 
-  protected checkLegalMoves(line: Square[]): Square[] {
-    return [];
-  }
-
   public getLegalMoves(board: Board): Square[] {
-    const NORTH = this.checkLegalMoves(
-      this.straightMove(Direction.NORTH, board)
+    const NORTH = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.NORTH, board))
     );
-    const EAST = this.checkLegalMoves(this.straightMove(Direction.EAST, board));
-    const SOUTH = this.checkLegalMoves(
-      this.straightMove(Direction.SOUTH, board)
+    const EAST = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.EAST, board))
     );
-    const WEST = this.checkLegalMoves(this.straightMove(Direction.WEST, board));
+    const SOUTH = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.SOUTH, board))
+    );
+    const WEST = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.straightMove(Direction.WEST, board))
+    );
 
     return [...NORTH, ...EAST, ...SOUTH, ...WEST];
   }
@@ -47,4 +60,4 @@ export default class Rook extends Piece {
   }
 }
 
-Object.assign(Rook.prototype, { straightMove, checkLegalMoves });
+Object.assign(Rook.prototype, { straightMove, getPathToEnemyKing });

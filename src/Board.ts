@@ -7,7 +7,6 @@ import King from "./pieces/King";
 import Queen from "./pieces/Queen";
 import Knight from "./pieces/Knight";
 import Pawn from "./pieces/Pawn";
-import { difference } from "lodash";
 
 export default class Board {
   board: Square[][];
@@ -17,6 +16,7 @@ export default class Board {
   public darkKing: King | null = null;
   public darkCoverage: Set<Square> = new Set();
   public lightCoverage: Set<Square> = new Set();
+  public pieceHistory: Map<string, number> = new Map();
 
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
     this.board = this.generateBoard();
@@ -107,6 +107,7 @@ export default class Board {
         if (piece) {
           piece.pos = this.board[rank][file].pos;
           this.pieces.push(piece);
+          this.pieceHistory.set(piece.uuid, 0);
         }
 
         file++;
@@ -116,27 +117,28 @@ export default class Board {
       iFEN++;
     }
 
-    this.getCoverage();
+    this.scan();
   }
 
   public getKing(shade: Shade): King | null {
-    const p: King | undefined = this.pieces.find(
+    const p = this.pieces.find(
       (p) => p.shade === shade && p.type === "King"
-    );
+    ) as King | undefined;
     return p ? p : null;
   }
 
-  private getCoverage() {
+  private scan() {
     this.lightCoverage.clear();
     this.darkCoverage.clear();
     this.pieces.forEach((p) => {
       p.threatenedBy.clear();
       p.threatens.clear();
+      p.myKingIsUnderCheck = false;
     });
     this.pieces.forEach((p) => {
       p.defaultMoves = p.getDefaultMoves(this);
       p.legalMoves = p.getLegalMoves(this);
-      p.threat();
+      p.threaten();
       if (p.shade === "light") {
         p.legalMoves.forEach((m) => this.lightCoverage.add(m));
       } else {
@@ -144,10 +146,24 @@ export default class Board {
       }
     });
 
-    if (this.darkKing)
+    if (this.darkKing) {
       this.darkKing.legalMoves = this.darkKing.getLegalMoves(this);
-    if (this.lightKing)
+      if (this.darkKing.isUnderCheck) this.signalKingUnderCheck(this.darkKing);
+    }
+    if (this.lightKing) {
       this.lightKing.legalMoves = this.lightKing.getLegalMoves(this);
+      if (this.lightKing.isUnderCheck)
+        this.signalKingUnderCheck(this.lightKing);
+    }
+  }
+
+  signalKingUnderCheck(king: King) {
+    this.pieces.forEach((p) => {
+      if (p.shade === king.shade && p.type !== "King") {
+        p.myKingIsUnderCheck = true;
+        p.findMovesToProtectKing(this);
+      }
+    });
   }
 
   public generateFEN() {
@@ -236,7 +252,7 @@ export default class Board {
   public movePiece(dst: Position, piece: Piece | null) {
     if (piece) {
       piece.move(dst, this);
-      this.getCoverage();
+      this.scan();
       // this.pieces.forEach((piece) => {
       //   piece.defaultMoves = piece.getDefaultMoves(this);
       //   piece.legalMoves = piece.getLegalMoves(this);
@@ -245,9 +261,13 @@ export default class Board {
   }
 
   public displayInConsole() {
+    const vBar = "│";
+    const tL = "  ┌───┬───┬───┬───┬───┬───┬───┬───┐";
+    const mL = "  ├───┼───┼───┼───┼───┼───┼───┼───┤";
+    const bL = "  └───┴───┴───┴───┴───┴───┴───┴───┘";
     const alphab = ["a", "b", "c", "d", "e", "f", "g", "h"];
     for (let rank = this.board.length - 1; rank >= 0; rank--) {
-      let line = "|";
+      let line = `${rank + 1} ${vBar} `;
       for (let file = 0; file < this.board[rank].length; file++) {
         const piece = this.getPiece(rank, file);
         if (!piece) {
@@ -255,11 +275,13 @@ export default class Board {
         } else {
           line += piece.unicodeChar;
         }
-        line += "|";
+        line += ` ${vBar} `;
       }
-      console.log("-".repeat(this.board.length * 2 + 1));
-      console.log(line + (rank + 1));
+      if (rank === 7) console.log(tL);
+      else console.log(mL);
+      console.log(line);
+      if (rank === 0) console.log(bL);
     }
-    console.log("|" + alphab.join("|") + "|");
+    console.log(`  ${vBar} ` + alphab.join(` ${vBar} `) + ` ${vBar}`);
   }
 }

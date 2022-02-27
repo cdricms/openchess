@@ -12,7 +12,7 @@ export default class Pawn extends Piece {
     const moves = this.defaultMoves;
     const lMoves: Square[] = [];
     moves.forEach((m) => {
-      if (m && this.checkMoveLegality(m, () => this.moveConditions(m))) {
+      if (m && this.checkMoveLegality(m, _, () => this.moveConditions(m))) {
         lMoves.push(m);
       }
     });
@@ -60,7 +60,11 @@ export default class Pawn extends Piece {
       if (frontSquare && !frontSquare?.piece) {
         moves.push(frontSquare!);
       } // 1 square move
-      if (this.timesMoved === 0 && front2Square && !front2Square?.piece) {
+      if (
+        board.pieceHistory.get(this.uuid) === 0 &&
+        front2Square &&
+        !front2Square?.piece
+      ) {
         moves.push(front2Square);
       } // 2 square move
       if (upRightSqu) {

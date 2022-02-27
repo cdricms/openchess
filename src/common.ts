@@ -1,3 +1,4 @@
+import Board from "./Board";
 import Piece from "./pieces/Piece";
 import Square from "./Square";
 
@@ -16,19 +17,19 @@ export type PieceType =
   | "King";
 
 export enum PiecesUnicode {
-  DarkKing = "\u2654",
-  DarkQueen = "\u2655",
-  DarkRook = "\u2656",
-  DarkBishop = "\u2657",
-  DarkKnight = "\u2658",
-  DarkPawn = "\u2659",
+  LightKing = "\u2654",
+  LightQueen = "\u2655",
+  LightRook = "\u2656",
+  LightBishop = "\u2657",
+  LightKnight = "\u2658",
+  LightPawn = "\u2659",
 
-  LightKing = "\u265A",
-  LightQueen = "\u265B",
-  LightRook = "\u265C",
-  LightBishop = "\u265D",
-  LightKnight = "\u265E",
-  LightPawn = "\u265F"
+  DarkKing = "\u265A",
+  DarkQueen = "\u265B",
+  DarkRook = "\u265C",
+  DarkBishop = "\u265D",
+  DarkKnight = "\u265E",
+  DarkPawn = "\u265F"
 }
 
 export type FENPieceNotation =
@@ -45,16 +46,32 @@ export type FENPieceNotation =
   | "Q"
   | "K";
 
-export function checkLegalMoves(this: Piece, line: Square[]) {
-  const l: Square[] = [];
-  for (const s of line) {
-    if (!s.piece) {
-      l.push(s);
-    } else if (s.piece.shade !== this.shade) {
-      l.push(s);
-      break;
-    } else break;
-  }
+export interface PathToEnemyKing {
+  pathToEnemyKing: Square[];
 
-  return l;
+  getPathToEnemyKing(board: Board, line: Square[]): Square[];
 }
+
+export function getPathToEnemyKing(
+  this: Piece & PathToEnemyKing,
+  board: Board,
+  line: Square[]
+): Square[] {
+  const enemyKing = this.shade === "dark" ? board.lightKing : board.darkKing;
+  if (enemyKing) {
+    let isThere = false;
+    for (const s of line) {
+      if (s.piece?.uuid === enemyKing.uuid) {
+        isThere = true;
+        break;
+      }
+    }
+    if (isThere) {
+      this.pathToEnemyKing = line;
+      console.log("hello");
+    }
+  }
+  return line;
+}
+
+export type TPathToEnemyKing = keyof PathToEnemyKing;

@@ -1,12 +1,21 @@
 import Board from "../Board";
-import { checkLegalMoves, Position, Shade } from "../common";
+import {
+  getPathToEnemyKing,
+  PathToEnemyKing,
+  Position,
+  Shade
+} from "../common";
 import { diagonalMove, Direction } from "../commonMovements";
 import Square from "../Square";
 import Piece from "./Piece";
 
-export default class Bishop extends Piece {
+export default class Bishop extends Piece implements PathToEnemyKing {
+  pathToEnemyKing: Square[] = [];
   constructor(shade: Shade, board: Board, pos?: Position) {
     super("Bishop", shade, board, pos);
+  }
+  getPathToEnemyKing(board: Board, line: Square[]): Square[] {
+    return [];
   }
 
   protected diagonalMove(
@@ -16,15 +25,23 @@ export default class Bishop extends Piece {
     return [];
   }
 
-  protected checkLegalMoves(diagonal: Square[]): Square[] {
-    return [];
-  }
-
   public getLegalMoves(board: Board): Square[] {
-    const NE = this.checkLegalMoves(this.diagonalMove(Direction.NE, board));
-    const SE = this.checkLegalMoves(this.diagonalMove(Direction.SE, board));
-    const SW = this.checkLegalMoves(this.diagonalMove(Direction.SW, board));
-    const NW = this.checkLegalMoves(this.diagonalMove(Direction.NW, board));
+    const NE = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.NE, board))
+    );
+    const SE = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.SE, board))
+    );
+    const SW = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.SW, board))
+    );
+    const NW = this.getPathToEnemyKing(
+      board,
+      this.checkMoveLegality(this.diagonalMove(Direction.NW, board))
+    );
 
     return [...NE, ...SE, ...SW, ...NW];
   }
@@ -39,4 +56,4 @@ export default class Bishop extends Piece {
   }
 }
 
-Object.assign(Bishop.prototype, { diagonalMove, checkLegalMoves });
+Object.assign(Bishop.prototype, { diagonalMove, getPathToEnemyKing });

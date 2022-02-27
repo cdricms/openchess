@@ -1,6 +1,8 @@
+import { randomUUID } from "crypto";
 import Board from "../Board";
 import {
   FENPieceNotation,
+  PathToEnemyKing,
   PiecesUnicode,
   PieceType,
   Position,
@@ -14,11 +16,13 @@ export default class Piece {
   pos?: Position;
   readonly unicodeChar: PiecesUnicode;
   readonly fenChar: FENPieceNotation;
-  timesMoved: number = 0;
   defaultMoves: Square[] = [];
   legalMoves: Square[] = [];
   threatens: Set<Piece> = new Set();
   threatenedBy: Set<Piece> = new Set();
+  protects: Set<Piece> = new Set();
+  readonly uuid = randomUUID();
+  myKingIsUnderCheck: boolean = false;
 
   protected constructor(
     type: PieceType,
@@ -50,7 +54,7 @@ export default class Piece {
     return this.legalMoves.includes(m);
   }
 
-  public threat() {
+  public threaten() {
     this.legalMoves.forEach((m) => {
       if (m.piece && m.piece.shade !== this.shade) {
         this.threatens.add(m.piece);
@@ -59,25 +63,93 @@ export default class Piece {
     });
   }
 
-  protected checkMoveLegality(move: Square, callback?: () => boolean) {
-    let isLegal = false;
-    if (!move.piece) {
-      isLegal = true;
+  public findMovesToProtectKing(board: Board) {
+    const myKing = this.shade === "dark" ? board.darkKing : board.lightKing;
+    if (myKing && myKing.threatenedBy.size <= 1) {
+      for (const threat of myKing.threatenedBy) {
+        if ("getPathToEnemyKing" in threat) {
+          this.legalMoves = this.legalMoves.filter(
+            (m) =>
+              (threat as Piece & PathToEnemyKing).pathToEnemyKing.includes(m) ||
+              (m.pos.rank === threat.pos?.rank &&
+                m.pos.file === threat.pos.file)
+          );
+        }
+      }
     } else {
-      isLegal = false;
-      if (move.piece.shade !== this.shade) {
+      this.legalMoves = [];
+    }
+  }
+  protected checkMoveLegality(
+    move: Square,
+    board?: Board,
+    callback?: () => boolean
+  ): boolean;
+  protected checkMoveLegality(lines: Square[], board?: Board): Square[];
+
+  protected checkMoveLegality(
+    s: Square | Square[],
+    board?: Board,
+    callback?: () => boolean
+  ) {
+    if (s instanceof Square) {
+      let isLegal = false;
+      if (!s.piece) {
         isLegal = true;
       } else {
         isLegal = false;
+        if (s.piece.shade !== this.shade) {
+          isLegal = true;
+        } else {
+          isLegal = false;
+          this.protects.add(s.piece);
+        }
       }
-    }
 
-    if (callback) {
-      isLegal = callback();
-    }
+      if (callback) {
+        isLegal = callback();
+      }
 
-    return isLegal;
+      return isLegal;
+    } else {
+      const l: Square[] = [];
+      for (const _s of s) {
+        if (!_s.piece) {
+          l.push(_s);
+        } else if (_s.piece.shade !== this.shade) {
+          l.push(_s);
+          break;
+        } else {
+          this.protects.add(_s.piece);
+          break;
+        }
+      }
+      return l;
+    }
   }
+
+  //   return isLegal;
+  // }
+  // protected checkMoveLegality(move: Square, callback?: () => boolean) {
+  //   let isLegal = false;
+  //   if (!move.piece) {
+  //     isLegal = true;
+  //   } else {
+  //     isLegal = false;
+  //     if (move.piece.shade !== this.shade) {
+  //       isLegal = true;
+  //     } else {
+  //       isLegal = false;
+  //       this.protects.add(move.piece);
+  //     }
+  //   }
+
+  //   if (callback) {
+  //     isLegal = callback();
+  //   }
+
+  //   return isLegal;
+  // }
 
   private getUnicodeAndFENChar(): {
     unicode: PiecesUnicode;
@@ -129,6 +201,7 @@ export default class Piece {
     }
 
     board.setPiece(this, dst.rank, dst.file);
-    this.timesMoved++;
+    let timesMoved = board.pieceHistory.get(this.uuid);
+    board.pieceHistory.set(this.uuid, timesMoved! + 1);
   }
 }
