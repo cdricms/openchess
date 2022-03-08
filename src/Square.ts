@@ -14,6 +14,7 @@ export default class Square {
   }
 
   private getChessPosition() {
+    // Get the right square position.
     const alphab = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const letter = alphab[this.pos.file];
     return { rank: this.pos.rank + 1, file: letter };

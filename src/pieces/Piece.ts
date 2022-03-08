@@ -9,6 +9,7 @@ import {
   Shade
 } from "../common";
 import Square from "../Square";
+import Pawn from "./Pawn";
 
 export default class Piece {
   readonly type: PieceType;
@@ -56,6 +57,7 @@ export default class Piece {
   }
 
   public threaten() {
+    // If a piece has in its legal moves an enemy, then it threatens, and notify the latter.
     this.legalMoves.forEach((m) => {
       if (m.piece && m.piece.shade !== this.shade) {
         this.threatens.add(m.piece);
@@ -64,9 +66,13 @@ export default class Piece {
     });
   }
 
+  // If its king is in check, it has to find the moves that could break that check.
   public findMovesToProtectKing(board: Board) {
+    // Get its proper king.
     const myKing = this.shade === "dark" ? board.darkKing : board.lightKing;
+    // The king has to be threatened only by one enemy, because a single move can not block two attacks on the king.
     if (myKing && myKing.threatenedBy.size <= 1) {
+      // Get which squares that are available to it that could block the check.
       for (const threat of myKing.threatenedBy) {
         if ("getPathToEnemyKing" in threat) {
           this.legalMoves = this.legalMoves.filter(
@@ -78,6 +84,7 @@ export default class Piece {
         }
       }
     } else {
+      // If none of these conditions meat, then it can't do anything.
       this.legalMoves = [];
     }
   }
@@ -93,15 +100,20 @@ export default class Piece {
     board?: Board,
     callback?: () => boolean
   ) {
+    // This is an overloaded function, and deals with two types of cases.
+    // The first case is if the piece can only move one by one (Pawn, King, Knight)
     if (s instanceof Square) {
       let isLegal = false;
+      // If there is no piece, then the move is surely legal
       if (!s.piece) {
         isLegal = true;
       } else {
         isLegal = false;
+        // If there is a piece, but it doesn't have the same color, then it is legal
         if (s.piece.shade !== this.shade) {
           isLegal = true;
         } else {
+          // If they share the same color, then it protects the other piece.
           isLegal = false;
           this.protects.add(s.piece);
           s.piece.protectedBy.add(this);
@@ -114,14 +126,20 @@ export default class Piece {
 
       return isLegal;
     } else {
+      // The other case is for piece that go straight in a line or diagonally (Rook, Bishop, Queen)
       const l: Square[] = [];
+      // For each piece, check:
       for (const _s of s) {
+        // if the there is no piece, then we can add that to the final array
         if (!_s.piece) {
           l.push(_s);
+
+          // If there is a piece but doesn't have the same color, then we add it and break.
         } else if (_s.piece.shade !== this.shade) {
           l.push(_s);
           break;
         } else {
+          // If they share the same color, we only protect it and break.
           this.protects.add(_s.piece);
           _s.piece.protectedBy.add(this);
           break;
@@ -170,9 +188,13 @@ export default class Piece {
   }
 
   public move(dst: Position, board: Board) {
+    // Get the new square
     const s = board.getSquare(dst.rank, dst.file);
+    // If it doesn't exist, then we simply return.
     if (!s) return;
+    // Check if the move is legal, if not return.
     if (s && !this.isMoveLegal(s)) return;
+    // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
     const hasPiece = s?.piece;
     if (hasPiece && hasPiece.type !== "King") {
@@ -180,9 +202,25 @@ export default class Piece {
       board.setPiece(null, dst.rank, dst.file);
     }
 
+    // En passant
+    // (To be remade I think.)
+    else if (this.type === "Pawn" && hasPiece?.type !== "King") {
+      const sign = this.shade === "dark" ? -1 : 1;
+      const p = board.getSquare(dst.rank - sign, dst.file);
+      if (p) {
+        board.setPiece(null, p.pos.rank, p.pos.file);
+        (this as unknown as Pawn).canTakeEnPassant = null;
+        (this as unknown as Pawn).timesEnPassant++;
+      }
+    }
+
+    // Set this piece to its new location.
     board.setPiece(this, dst.rank, dst.file);
+    // Update the history of times moves
     let timesMoved = board.pieceHistory.get(this.uuid);
     board.pieceHistory.set(this.uuid, timesMoved! + 1);
     board.totalMoves++;
+    // Update the order.
+    board.history.push({ uuid: this.uuid });
   }
 }

@@ -4,6 +4,8 @@ import Square from "../Square";
 import Piece from "./Piece";
 
 export default class Pawn extends Piece {
+  canTakeEnPassant: Pawn | null = null;
+  timesEnPassant: number = 0;
   constructor(shade: Shade, board: Board, pos?: Position) {
     super("Pawn", shade, board, pos);
   }
@@ -21,27 +23,53 @@ export default class Pawn extends Piece {
 
   protected moveConditions(m: Square): boolean {
     const sign = this.shade === "light" ? 1 : -1;
+
+    if (this.canTakeEnPassant) {
+      if (
+        m.pos.rank - sign === this.canTakeEnPassant.pos?.rank &&
+        m.pos.file === this.canTakeEnPassant.pos.file
+      )
+        return true;
+    }
+
+    // Check if it is the move in front of this pawn
     if (
       m.pos.rank === this.pos?.rank! + sign ||
       m.pos.rank === this.pos?.rank! + sign * 2
     ) {
+      // Check if it the move on the sides but not the move 2 squares ahead.
       if (
-        (m.pos.rank !== this.pos?.rank! + sign * 2 &&
-          m.pos.file === this.pos?.file! + sign) ||
-        m.pos.file === this.pos?.file! - sign
+        m.pos.rank !== this.pos?.rank! + sign * 2 &&
+        (m.pos.file === this.pos?.file! + sign ||
+          m.pos.file === this.pos?.file! - sign)
       ) {
+        // return if there is a piece and the piece is an enemy
         return m.piece !== null && m.piece.shade !== this.shade;
       }
 
+      // else if there is a piece, return false if ally.
       return m.piece ? false : true;
     }
 
     return false;
   }
 
+  #isEnPassant(pawn: Pawn, board: Board) {
+    const timesMoved = board.pieceHistory.get(pawn.uuid);
+    if (
+      timesMoved === 1 &&
+      board.history[board.history.length - 1].uuid === pawn.uuid
+    ) {
+      this.canTakeEnPassant = pawn;
+      return true;
+    }
+    return false;
+  }
+
   public getDefaultMoves(board: Board) {
     const moves: Square[] = [];
     if (this.pos) {
+      this.canTakeEnPassant = null;
       const sign = this.shade === "light" ? 1 : -1;
       const frontSquare = board.getSquare(this.pos.rank + sign, this.pos.file);
       const front2Square = board.getSquare(
@@ -72,6 +100,27 @@ export default class Pawn extends Piece {
       }
       if (upLeftSquare) {
         moves.push(upLeftSquare);
+      }
+
+      if (this.timesEnPassant === 0) {
+        const right = board.getSquare(this.pos.rank, this.pos.file + sign);
+        const left = board.getSquare(this.pos.rank, this.pos.file - sign);
+        if (
+          upRightSqu &&
+          !upRightSqu.piece &&
+          right &&
+          right.piece instanceof Pawn &&
+          this.#isEnPassant(right.piece, board)
+        )
+          if (!moves.includes(upRightSqu)) moves.push(upRightSqu);
+        if (
+          upLeftSquare &&
+          !upLeftSquare.piece &&
+          left &&
+          left.piece instanceof Pawn &&
+          this.#isEnPassant(left.piece, board)
+        )
+          if (!moves.includes(upLeftSquare)) moves.push(upLeftSquare);
       }
     }
     return moves;

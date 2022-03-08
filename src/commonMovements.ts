@@ -66,6 +66,7 @@ function directionalMove(
   const moves: Square[] = [];
   const d = getDirection(direction);
   let sqre: Square | null = board.getSquare(piece.pos?.rank!, piece.pos?.file!);
+  // While there is a next square keep on getting.
   while (
     sqre &&
     (sqre = board.getSquare(sqre.pos.rank + d.rank, sqre.pos.file + d.file))
