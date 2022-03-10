@@ -9,8 +9,11 @@ export default class King extends Piece {
     super("King", shade, board, pos);
   }
 
-  #isProtected(piece: Piece): boolean {
-    return this.threatenedBy.has(piece) && piece.protectedBy.size > 0;
+  #isProtected(piece: Piece | null): boolean {
+    if (piece) {
+      return this.threatenedBy.has(piece) && piece.protectedBy.size > 0;
+    }
+    return false;
   }
 
   public getLegalMoves(board: Board): Square[] {
@@ -19,10 +22,8 @@ export default class King extends Piece {
     const lMoves: Square[] = [];
     this.defaultMoves.forEach((m) => {
       if (
-        m &&
         this.checkMoveLegality(m) &&
         !enCoverage.has(m) &&
-        m.piece &&
         !this.#isProtected(m.piece)
       ) {
         lMoves.push(m);

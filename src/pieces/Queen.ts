@@ -38,37 +38,37 @@ export default class Queen extends Piece implements PathToEnemyKing {
   }
 
   public getLegalMoves(board: Board): Square[] {
-    const NORTH = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.straightMove(Direction.NORTH, board))
+    const NORTH = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.straightMove(Direction.NORTH, board)),
+      board
     );
-    const EAST = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.straightMove(Direction.EAST, board))
+    const EAST = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.straightMove(Direction.EAST, board)),
+      board
     );
-    const SOUTH = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.straightMove(Direction.SOUTH, board))
+    const SOUTH = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.straightMove(Direction.SOUTH, board)),
+      board
     );
-    const WEST = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.straightMove(Direction.WEST, board))
+    const WEST = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.straightMove(Direction.WEST, board)),
+      board
     );
-    const NE = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.diagonalMove(Direction.NE, board))
+    const NE = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.diagonalMove(Direction.NE, board)),
+      board
     );
-    const SE = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.diagonalMove(Direction.SE, board))
+    const SE = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.diagonalMove(Direction.SE, board)),
+      board
     );
-    const SW = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.diagonalMove(Direction.SW, board))
+    const SW = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.diagonalMove(Direction.SW, board)),
+      board
     );
-    const NW = this.getPathToEnemyKing(
-      board,
-      this.checkMoveLegality(this.diagonalMove(Direction.NW, board))
+    const NW = this.checkMoveLegality(
+      this.getPathToEnemyKing(board, this.diagonalMove(Direction.NW, board)),
+      board
     );
 
     return [...NORTH, ...NE, ...EAST, ...SE, ...SOUTH, ...SW, ...WEST, ...NW];

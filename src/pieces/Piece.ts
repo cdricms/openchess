@@ -66,6 +66,21 @@ export default class Piece {
     });
   }
 
+  public doIIntersect(): boolean {
+    const threats = this.threatenedBy;
+    for (const threat of threats) {
+      if (threat.type === "Bishop" || "Queen" || "Rook") {
+        const t = threat as Piece & PathToEnemyKing;
+        for (const s of t.pathToEnemyKing) {
+          if (s.piece === this) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   // If its king is in check, it has to find the moves that could break that check.
   public findMovesToProtectKing(board: Board) {
     // Get its proper king.

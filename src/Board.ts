@@ -1,7 +1,7 @@
 import Piece from "./pieces/Piece";
 import Rook from "./pieces/Rook";
 import Square from "./Square";
-import { FENPieceNotation, Position, Shade } from "./common";
+import { FENPieceNotation, PathToEnemyKing, Position, Shade } from "./common";
 import Bishop from "./pieces/Bishop";
 import King from "./pieces/King";
 import Queen from "./pieces/Queen";
@@ -188,12 +188,22 @@ export default class Board {
       p.protects.clear();
       p.protectedBy.clear();
       p.myKingIsUnderCheck = false;
+      if ("pathToEnemyKing" in p) {
+        (p as Piece & PathToEnemyKing).pathToEnemyKing = [];
+      }
     });
     // When all of this is cleared, we can get the new values.
     this.pieces.forEach((p) => {
       p.defaultMoves = p.getDefaultMoves(this);
       p.legalMoves = p.getLegalMoves(this);
       p.threaten();
+    });
+    this.pieces.forEach((p) => {
+      if (p.doIIntersect()) {
+        p.threatenedBy.forEach((threat) => {
+          p.legalMoves = p.legalMoves.filter((m) => m.piece === threat);
+        });
+      }
       if (p.shade === "light") {
         p.legalMoves.forEach((m) => this.lightCoverage.add(m));
       } else {
@@ -212,8 +222,8 @@ export default class Board {
     if (this.lightKing) {
       this.lightKing.legalMoves = this.lightKing.getLegalMoves(this);
       if (this.lightKing.isUnderCheck) {
+        this.#signalKingUnderCheck(this.lightKing);
       }
-      this.#signalKingUnderCheck(this.lightKing);
     }
     // If one side cannot move any piece then the adversary won.
     if (this.darkCoverage.size === 0) this.whoWon = "light";
@@ -223,6 +233,7 @@ export default class Board {
   #signalKingUnderCheck(king: King) {
     // Get which we are talking about.
     const cov = king.shade === "dark" ? this.darkCoverage : this.lightCoverage;
+    console.log("what");
 
     // Notify them that their King is under check, so they can find moves to protect him.
     this.pieces.forEach((p) => {
@@ -278,10 +289,10 @@ export default class Board {
 
   #generateBoard() {
     // Initialize an array of 8 null elements
-    const board: Square[][] = new Array(8).fill(new Array(8));
+    const board: Square[][] = new Array(8);
 
-    // // And fill it with 8 new arrays of 8 null elements
-    // for (let rank = 0; rank < board.length; rank++) board[rank] = new Array(8);
+    // And fill it with 8 new arrays of 8 null elements
+    for (let rank = 0; rank < board.length; rank++) board[rank] = new Array(8);
 
     // For each index, give them a square with the proper color.
     // Also starting from the end for the rank, for reasons explained at the top of the file.
