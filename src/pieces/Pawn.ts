@@ -7,7 +7,14 @@ export default class Pawn extends Piece {
   canTakeEnPassant: Pawn | null = null;
   timesEnPassant: number = 0;
   constructor(shade: Shade, board: Board, pos?: Position) {
-    super("Pawn", shade, board, pos);
+    const rank = shade === "light" ? 1 : 6;
+    const files: number[] = [0, 1, 2, 3, 4, 5, 6, 7];
+
+    const initSquares = files.map((file): Position => {
+      return { rank, file };
+    });
+
+    super("Pawn", shade, board, pos, initSquares);
   }
 
   public getLegalMoves(_: Board) {
@@ -89,7 +96,10 @@ export default class Pawn extends Piece {
         moves.push(frontSquare!);
       } // 1 square move
       if (
-        board.pieceHistory.get(this.uuid) === 0 &&
+        this.timesMoved === 0 &&
+        this.initialSquares.find(
+          (p) => p.rank === this.pos?.rank && p.file === this.pos?.file
+        ) &&
         front2Square &&
         !front2Square?.piece
       ) {

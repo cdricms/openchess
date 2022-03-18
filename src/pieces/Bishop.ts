@@ -3,7 +3,7 @@ import {
   getPathToEnemyKing,
   PathToEnemyKing,
   Position,
-  Shade
+  Shade,
 } from "../common";
 import { diagonalMove, Direction } from "../commonMovements";
 import Square from "../Square";
@@ -12,7 +12,12 @@ import Piece from "./Piece";
 export default class Bishop extends Piece implements PathToEnemyKing {
   pathToEnemyKing: Square[] = [];
   constructor(shade: Shade, board: Board, pos?: Position) {
-    super("Bishop", shade, board, pos);
+    const rank = shade === "dark" ? 7 : 0;
+    const initSquares: Position[] = [
+      { rank, file: 2 },
+      { rank, file: 5 },
+    ];
+    super("Bishop", shade, board, pos, initSquares);
   }
   getPathToEnemyKing(board: Board, line: Square[]): Square[] {
     return [];

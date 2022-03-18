@@ -3,7 +3,7 @@ import {
   getPathToEnemyKing,
   PathToEnemyKing,
   Position,
-  Shade
+  Shade,
 } from "../common";
 import { diagonalMove, Direction, straightMove } from "../commonMovements";
 import Square from "../Square";
@@ -12,7 +12,9 @@ import Piece from "./Piece";
 export default class Queen extends Piece implements PathToEnemyKing {
   pathToEnemyKing: Square[] = [];
   constructor(shade: Shade, board: Board, pos?: Position) {
-    super("Queen", shade, board, pos);
+    const rank = shade === "dark" ? 7 : 0;
+    const initSquare: Position[] = [{ rank, file: 3 }];
+    super("Queen", shade, board, pos, initSquare);
   }
 
   protected diagonalMove(
@@ -91,6 +93,6 @@ export default class Queen extends Piece implements PathToEnemyKing {
 Object.assign(Queen.prototype, {
   diagonalMove,
   straightMove,
-  getPathToEnemyKing
+  getPathToEnemyKing,
   // checkLegalMoves
 });

@@ -7,6 +7,9 @@ export interface Position {
   file: number;
 }
 
+export const alphabet = ["A", "B", "C", "D", "E", "F", "G", "H"];
+export type TAlphabet = typeof alphabet;
+
 export type Shade = "dark" | "light";
 export type PieceType =
   | "Pawn"
@@ -29,7 +32,7 @@ export enum PiecesUnicode {
   DarkRook = "\u265C",
   DarkBishop = "\u265D",
   DarkKnight = "\u265E",
-  DarkPawn = "\u265F"
+  DarkPawn = "\u265F",
 }
 
 export type FENPieceNotation =

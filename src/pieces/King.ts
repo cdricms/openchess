@@ -6,7 +6,9 @@ import Piece from "./Piece";
 
 export default class King extends Piece {
   constructor(shade: Shade, board: Board, pos?: Position) {
-    super("King", shade, board, pos);
+    const rank = shade === "dark" ? 7 : 0;
+    const initSquares: Position[] = [{ rank, file: 4 }];
+    super("King", shade, board, pos, initSquares);
   }
 
   #isProtected(piece: Piece | null): boolean {
@@ -46,7 +48,7 @@ export default class King extends Piece {
       "SOUTH",
       "SW",
       "WEST",
-      "NW"
+      "NW",
     ];
     for (let i = 0; i < 8; i++) {
       const d = getDirection(Direction[dir[i]]);
@@ -57,7 +59,7 @@ export default class King extends Piece {
       if (s) moves.push(s);
     }
 
-    /// Need to had the possibility to castle.
+    /// Need to add the possibility to castle.
 
     return moves;
   }

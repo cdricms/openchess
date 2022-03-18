@@ -5,7 +5,12 @@ import Piece from "./Piece";
 
 export default class Knight extends Piece {
   constructor(shade: Shade, board: Board, pos?: Position) {
-    super("Knight", shade, board, pos);
+    const rank = shade === "dark" ? 7 : 0;
+    const initSquares: Position[] = [
+      { rank, file: 1 },
+      { rank, file: 6 },
+    ];
+    super("Knight", shade, board, pos, initSquares);
   }
 
   public getDefaultMoves(board: Board): Square[] {
@@ -19,7 +24,7 @@ export default class Knight extends Piece {
         [1, 2],
         [1, -2],
         [-1, 2],
-        [-1, -2]
+        [-1, -2],
       ];
 
       p.forEach((pos) => {

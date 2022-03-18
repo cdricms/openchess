@@ -6,7 +6,7 @@ import {
   PiecesUnicode,
   PieceType,
   Position,
-  Shade
+  Shade,
 } from "../common";
 import Square from "../Square";
 import Pawn from "./Pawn";
@@ -25,12 +25,15 @@ export default class Piece {
   protectedBy: Set<Piece> = new Set();
   readonly uuid = randomUUID();
   myKingIsUnderCheck: boolean = false;
+  #_initialSquares: Position[] = [];
+  timesMoved = 0;
 
   protected constructor(
     type: PieceType,
     shade: Shade,
     board: Board,
-    pos?: Position
+    pos?: Position,
+    initialSquares?: Position[]
   ) {
     this.type = type;
     this.shade = shade;
@@ -40,6 +43,15 @@ export default class Piece {
     this.fenChar = fenChar;
     this.defaultMoves = this.getDefaultMoves(board);
     this.legalMoves = this.getLegalMoves(board);
+    this.initialSquares = initialSquares || [];
+  }
+
+  protected get initialSquares() {
+    return this.#_initialSquares;
+  }
+
+  protected set initialSquares(initialSquares: Position[]) {
+    this.#_initialSquares = initialSquares;
   }
 
   public getDefaultMoves(board: Board): Square[] {
@@ -232,6 +244,7 @@ export default class Piece {
     // Set this piece to its new location.
     board.setPiece(this, dst.rank, dst.file);
     // Update the history of times moves
+    this.timesMoved++;
     let timesMoved = board.pieceHistory.get(this.uuid);
     board.pieceHistory.set(this.uuid, timesMoved! + 1);
     board.totalMoves++;
