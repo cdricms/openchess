@@ -18,7 +18,7 @@ export default class Board {
   public lightCoverage: Set<Square> = new Set();
   public pieceHistory: Map<string, number> = new Map();
   public totalMoves = 0;
-  public whoWon: Shade | null = null;
+  public whoWon: Shade | "draw" | null = null;
   public history: { uuid: string }[] = [];
 
   // The board is generated based on FEN: https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
