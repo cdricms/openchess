@@ -95,6 +95,10 @@ const _sketch = (p5: p5) => {
       if (square) drawSquare(square);
     });
     if (selectedSquare && selectedSquare.piece) {
+      drawSquare(selectedSquare, (x, y) => {
+        p5.fill(0, 0, 120, 175);
+        p5.square(x, y, p5.width / 8);
+      });
       selectedSquare.piece.legalMoves.forEach((m) => {
         drawSquare(m, (x, y) => {
           p5.fill(0, 255, 0, 150);
