@@ -7,10 +7,11 @@
     "declarationMap": true,
     "noEmitOnError": true,
     "skipLibCheck": true,
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "types": [],
     "paths": {
-      "@cdricms/*": ["packages/*/src"]
+      "@cdricms/*": ["./packages/*/src"]
     },
     "noEmit": true
   },
