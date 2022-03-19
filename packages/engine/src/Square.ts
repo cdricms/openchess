@@ -1,11 +1,11 @@
-import { Position, Shade } from "./common";
-import Piece from "./pieces/Piece";
+import { Position, Shade } from "./common.js";
+import Piece from "./pieces/Piece.js";
 
 export default class Square {
   piece: Piece | null = null;
-  protected shade: Shade;
+  public shade: Shade;
   readonly pos: Position;
-  protected readonly chessPosition: { rank: number; file: string };
+  readonly chessPosition: { rank: number; file: string };
 
   constructor(shade: Shade, pos: Position) {
     this.shade = shade;

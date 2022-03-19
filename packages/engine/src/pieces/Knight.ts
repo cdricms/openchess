@@ -1,14 +1,14 @@
-import Board from "../Board";
-import { Position, Shade } from "../common";
-import Square from "../Square";
-import Piece from "./Piece";
+import Board from "../Board.js";
+import { Position, Shade } from "../common.js";
+import Square from "../Square.js";
+import Piece from "./Piece.js";
 
 export default class Knight extends Piece {
   constructor(shade: Shade, board: Board, pos?: Position) {
     const rank = shade === "dark" ? 7 : 0;
     const initSquares: Position[] = [
       { rank, file: 1 },
-      { rank, file: 6 },
+      { rank, file: 6 }
     ];
     super("Knight", shade, board, pos, initSquares);
   }
@@ -24,7 +24,7 @@ export default class Knight extends Piece {
         [1, 2],
         [1, -2],
         [-1, 2],
-        [-1, -2],
+        [-1, -2]
       ];
 
       p.forEach((pos) => {

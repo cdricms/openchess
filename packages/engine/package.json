@@ -1,0 +1,33 @@
+{
+  "name": "@cdricms/engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "launch": "tsc && node ./dist/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdricms/openchess.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cdricms/openchess/issues"
+  },
+  "homepage": "https://github.com/cdricms/openchess#readme",
+  "devDependencies": {
+    "@types/lodash": "^4.14.179",
+    "@types/node": "^17.0.19",
+    "@types/uuid": "^8.3.4",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "uuid": "^8.3.2"
+  }
+}

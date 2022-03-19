@@ -1,13 +1,13 @@
-import Board from "../Board";
+import Board from "../Board.js";
 import {
   getPathToEnemyKing,
   PathToEnemyKing,
   Position,
-  Shade,
-} from "../common";
-import { diagonalMove, Direction, straightMove } from "../commonMovements";
-import Square from "../Square";
-import Piece from "./Piece";
+  Shade
+} from "../common.js";
+import { diagonalMove, Direction, straightMove } from "../commonMovements.js";
+import Square from "../Square.js";
+import Piece from "./Piece.js";
 
 export default class Queen extends Piece implements PathToEnemyKing {
   pathToEnemyKing: Square[] = [];
@@ -93,6 +93,6 @@ export default class Queen extends Piece implements PathToEnemyKing {
 Object.assign(Queen.prototype, {
   diagonalMove,
   straightMove,
-  getPathToEnemyKing,
+  getPathToEnemyKing
   // checkLegalMoves
 });

@@ -1,15 +1,15 @@
-import { randomUUID } from "crypto";
-import Board from "../Board";
+import { v4 as uuidv4 } from "uuid";
+import Board from "../Board.js";
 import {
   FENPieceNotation,
   PathToEnemyKing,
   PiecesUnicode,
   PieceType,
   Position,
-  Shade,
-} from "../common";
-import Square from "../Square";
-import Pawn from "./Pawn";
+  Shade
+} from "../common.js";
+import Square from "../Square.js";
+import Pawn from "./Pawn.js";
 
 export default class Piece {
   readonly type: PieceType;
@@ -23,10 +23,11 @@ export default class Piece {
   threatenedBy: Set<Piece> = new Set();
   protects: Set<Piece> = new Set();
   protectedBy: Set<Piece> = new Set();
-  readonly uuid = randomUUID();
+  readonly uuid = uuidv4();
   myKingIsUnderCheck: boolean = false;
   #_initialSquares: Position[] = [];
   timesMoved = 0;
+  canBeEaten: boolean = true;
 
   protected constructor(
     type: PieceType,
@@ -81,7 +82,11 @@ export default class Piece {
   public doIIntersect(): boolean {
     const threats = this.threatenedBy;
     for (const threat of threats) {
-      if (threat.type === "Bishop" || "Queen" || "Rook") {
+      if (
+        threat.type === "Bishop" ||
+        threat.type === "Queen" ||
+        threat.type === "Rook"
+      ) {
         const t = threat as Piece & PathToEnemyKing;
         for (const s of t.pathToEnemyKing) {
           if (s.piece === this) {
@@ -220,18 +225,21 @@ export default class Piece {
     // If it doesn't exist, then we simply return.
     if (!s) return;
     // Check if the move is legal, if not return.
+    const hasPiece = s?.piece;
     if (s && !this.isMoveLegal(s)) return;
+    if (hasPiece && !hasPiece?.canBeEaten) return;
     // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
-    const hasPiece = s?.piece;
-    if (hasPiece && hasPiece.type !== "King") {
+    if (hasPiece && hasPiece.canBeEaten) {
       // Piece gets eaten
+      const en = board.getPiece(dst.rank, dst.file);
+      board.pieces = board.pieces.filter((p) => p !== en);
       board.setPiece(null, dst.rank, dst.file);
     }
 
     // En passant
     // (To be remade I think.)
-    else if (this.type === "Pawn" && hasPiece?.type !== "King") {
+    else if (this.type === "Pawn" && hasPiece?.canBeEaten) {
       const sign = this.shade === "dark" ? -1 : 1;
       const p = board.getSquare(dst.rank - sign, dst.file);
       if (p) {

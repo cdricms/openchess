@@ -1,7 +1,7 @@
-import Board from "../Board";
-import { Position, Shade } from "../common";
-import Square from "../Square";
-import Piece from "./Piece";
+import Board from "../Board.js";
+import { Position, Shade } from "../common.js";
+import Square from "../Square.js";
+import Piece from "./Piece.js";
 
 export default class Pawn extends Piece {
   canTakeEnPassant: Pawn | null = null;

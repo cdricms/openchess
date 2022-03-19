@@ -1,9 +1,9 @@
 import Board from "./Board";
-import { Position } from "./common";
-import Bishop from "./pieces/Bishop";
-import Queen from "./pieces/Queen";
-import Rook from "./pieces/Rook";
-import Square from "./Square";
+import { Position } from "./common.js";
+import Bishop from "./pieces/Bishop.js";
+import Queen from "./pieces/Queen.js";
+import Rook from "./pieces/Rook.js";
+import Square from "./Square.js";
 
 export enum Direction {
   NORTH,

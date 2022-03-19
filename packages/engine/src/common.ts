@@ -1,6 +1,6 @@
 import Board from "./Board";
-import Piece from "./pieces/Piece";
-import Square from "./Square";
+import Piece from "./pieces/Piece.js";
+import Square from "./Square.js";
 
 export interface Position {
   rank: number;
@@ -32,7 +32,7 @@ export enum PiecesUnicode {
   DarkRook = "\u265C",
   DarkBishop = "\u265D",
   DarkKnight = "\u265E",
-  DarkPawn = "\u265F",
+  DarkPawn = "\u265F"
 }
 
 export type FENPieceNotation =

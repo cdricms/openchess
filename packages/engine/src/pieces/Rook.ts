@@ -1,13 +1,13 @@
-import Board from "../Board";
+import Board from "../Board.js";
 import {
   getPathToEnemyKing,
   PathToEnemyKing,
   Position,
-  Shade,
-} from "../common";
-import { Direction, straightMove } from "../commonMovements";
-import Square from "../Square";
-import Piece from "./Piece";
+  Shade
+} from "../common.js";
+import { Direction, straightMove } from "../commonMovements.js";
+import Square from "../Square.js";
+import Piece from "./Piece.js";
 
 export default class Rook extends Piece implements PathToEnemyKing {
   pathToEnemyKing: Square[] = [];
@@ -15,7 +15,7 @@ export default class Rook extends Piece implements PathToEnemyKing {
     const rank = shade === "dark" ? 7 : 0;
     const initSquares: Position[] = [
       { rank, file: 0 },
-      { rank, file: 7 },
+      { rank, file: 7 }
     ];
     super("Rook", shade, board, pos, initSquares);
   }

@@ -1,12 +1,17 @@
-import Piece from "./pieces/Piece";
-import Rook from "./pieces/Rook";
-import Square from "./Square";
-import { FENPieceNotation, PathToEnemyKing, Position, Shade } from "./common";
-import Bishop from "./pieces/Bishop";
-import King from "./pieces/King";
-import Queen from "./pieces/Queen";
-import Knight from "./pieces/Knight";
-import Pawn from "./pieces/Pawn";
+import Piece from "./pieces/Piece.js";
+import Rook from "./pieces/Rook.js";
+import Square from "./Square.js";
+import {
+  FENPieceNotation,
+  PathToEnemyKing,
+  Position,
+  Shade
+} from "./common.js";
+import Bishop from "./pieces/Bishop.js";
+import King from "./pieces/King.js";
+import Queen from "./pieces/Queen.js";
+import Knight from "./pieces/Knight.js";
+import Pawn from "./pieces/Pawn.js";
 
 export default class Board {
   board: Square[][];
