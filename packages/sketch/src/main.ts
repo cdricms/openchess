@@ -129,15 +129,13 @@ const _sketch = (p5: p5) => {
   };
 
   const move = () => {
-    if (selectedSquare && selectedSquare.piece) {
-      selectedSquare.piece.legalMoves.forEach((m) => {
-        const [c] = checkClick(m);
-        if (c) {
-          board.movePiece(m.pos, selectedSquare!.piece);
-          selectedSquare = null;
-        }
-      });
-    }
+    selectedSquare?.piece?.legalMoves.forEach((m) => {
+      const [c] = checkClick(m);
+      if (c) {
+        board.movePiece(m.pos, selectedSquare!.piece);
+        selectedSquare = null;
+      }
+    });
     board.forEach((square) => {
       if (square) {
         if (checkClick(square)[0]) {
@@ -155,9 +153,10 @@ const _sketch = (p5: p5) => {
     }
   };
 
-  p5.mouseClicked = () => {
-    move();
-  };
+  // p5.mouseClicked = () => {
+  //   console.log("cliked");
+  //   move();
+  // };
 
   p5.mouseDragged = () => {
     switch (p5.mouseButton) {
@@ -173,6 +172,9 @@ const _sketch = (p5: p5) => {
 
   p5.mouseReleased = () => {
     draggingPiece = false;
+    if (selectedSquare) {
+      move();
+    }
   };
 
   p5.draw = () => {
