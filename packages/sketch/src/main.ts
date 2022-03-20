@@ -128,7 +128,7 @@ const _sketch = (p5: p5) => {
     ];
   };
 
-  p5.mouseClicked = () => {
+  const move = () => {
     if (selectedSquare && selectedSquare.piece) {
       selectedSquare.piece.legalMoves.forEach((m) => {
         const [c] = checkClick(m);
@@ -147,11 +147,27 @@ const _sketch = (p5: p5) => {
     });
   };
 
+  p5.mousePressed = () => {
+    switch (p5.mouseButton) {
+      case p5.LEFT:
+        move();
+        break;
+    }
+  };
+
+  p5.mouseClicked = () => {
+    move();
+  };
+
   p5.mouseDragged = () => {
-    if (selectedSquare && selectedSquare.piece) {
-      draggingPiece = true;
-    } else {
-      p5.mouseClicked();
+    switch (p5.mouseButton) {
+      case p5.LEFT:
+        if (selectedSquare && selectedSquare.piece) {
+          draggingPiece = true;
+        } else {
+          move();
+        }
+        break;
     }
   };
 

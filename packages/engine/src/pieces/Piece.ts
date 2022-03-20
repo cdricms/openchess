@@ -113,6 +113,11 @@ export default class Piece {
               (m.pos.rank === threat.pos?.rank &&
                 m.pos.file === threat.pos.file)
           );
+        } else {
+          this.legalMoves = this.legalMoves.filter(
+            (m) =>
+              m.pos.rank === threat.pos?.rank && m.pos.file === threat.pos.file
+          );
         }
       }
     } else {
