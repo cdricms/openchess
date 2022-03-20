@@ -94,17 +94,17 @@ export default class Pawn extends Piece {
 
       if (frontSquare && !frontSquare?.piece) {
         moves.push(frontSquare!);
+        if (
+          this.timesMoved === 0 &&
+          this.initialSquares.find(
+            (p) => p.rank === this.pos?.rank && p.file === this.pos?.file
+          ) &&
+          front2Square &&
+          !front2Square?.piece
+        ) {
+          moves.push(front2Square);
+        } // 2 square move
       } // 1 square move
-      if (
-        this.timesMoved === 0 &&
-        this.initialSquares.find(
-          (p) => p.rank === this.pos?.rank && p.file === this.pos?.file
-        ) &&
-        front2Square &&
-        !front2Square?.piece
-      ) {
-        moves.push(front2Square);
-      } // 2 square move
       if (upRightSqu) {
         moves.push(upRightSqu);
       }
