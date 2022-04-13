@@ -62,15 +62,28 @@ export default class Pawn extends Piece {
   }
 
   #isEnPassant(pawn: Pawn, board: Board) {
-    const timesMoved = board.pieceHistory.get(pawn.uuid);
     if (
-      timesMoved === 1 &&
+      pawn.timesMoved === 1 &&
       board.history[board.history.length - 1].uuid === pawn.uuid
     ) {
       this.canTakeEnPassant = pawn;
+      console.log(pawn);
       return true;
     }
     return false;
+  }
+
+  public getCoverageMoves(board: Board): Square[] {
+    const sign = this.shade === "light" ? 1 : -1;
+
+    return this.defaultMoves.filter(
+      (move) =>
+        !(
+          move.pos.file === this.pos?.file &&
+          (move.pos.rank === this.pos?.rank + sign ||
+            move.pos.rank === this.pos.rank + sign * 2)
+        )
+    );
   }
 
   public getDefaultMoves(board: Board) {

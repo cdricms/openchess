@@ -179,6 +179,7 @@ export default class Board {
   }
 
   #scan() {
+    console.table(this.history);
     // I would like to note that this algorithm is far from being perfect, and should actually be revisited to make it more accurate.
     // It could also be optimized, maybe by using a caching method. But not sure about that.
 
@@ -201,6 +202,7 @@ export default class Board {
     this.pieces.forEach((p) => {
       p.defaultMoves = p.getDefaultMoves(this);
       p.legalMoves = p.getLegalMoves(this);
+      p.coverage = p.getCoverageMoves(this);
       p.threaten();
     });
     this.pieces.forEach((p) => {
@@ -210,9 +212,9 @@ export default class Board {
         });
       }
       if (p.shade === "light") {
-        p.legalMoves.forEach((m) => this.lightCoverage.add(m));
+        p.coverage.forEach((m) => this.lightCoverage.add(m));
       } else {
-        p.legalMoves.forEach((m) => this.darkCoverage.add(m));
+        p.coverage.forEach((m) => this.darkCoverage.add(m));
       }
     });
 
@@ -238,7 +240,6 @@ export default class Board {
   #signalKingUnderCheck(king: King) {
     // Get which we are talking about.
     const cov = king.shade === "dark" ? this.darkCoverage : this.lightCoverage;
-    console.log("what");
 
     // Notify them that their King is under check, so they can find moves to protect him.
     this.pieces.forEach((p) => {
@@ -251,7 +252,7 @@ export default class Board {
     cov.clear();
     this.pieces.forEach((p) => {
       if (p.shade === king.shade) {
-        p.legalMoves.forEach((m) => {
+        p.coverage.forEach((m) => {
           cov.add(m);
         });
       }

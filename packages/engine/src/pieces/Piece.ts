@@ -19,6 +19,7 @@ export default class Piece {
   readonly fenChar: FENPieceNotation;
   defaultMoves: Square[] = [];
   legalMoves: Square[] = [];
+  coverage: Square[] = [];
   threatens: Set<Piece> = new Set();
   threatenedBy: Set<Piece> = new Set();
   protects: Set<Piece> = new Set();
@@ -61,6 +62,11 @@ export default class Piece {
   public getLegalMoves(board: Board): Square[] {
     return [];
   }
+
+  public getCoverageMoves(board: Board): Square[] {
+    return this.legalMoves;
+  }
+
   protected moveConditions(m: Square): boolean {
     return false;
   }
@@ -71,7 +77,7 @@ export default class Piece {
 
   public threaten() {
     // If a piece has in its legal moves an enemy, then it threatens, and notify the latter.
-    this.legalMoves.forEach((m) => {
+    this.coverage.forEach((m) => {
       if (m.piece && m.piece.shade !== this.shade) {
         this.threatens.add(m.piece);
         m.piece.threatenedBy.add(this);
@@ -243,14 +249,21 @@ export default class Piece {
     }
 
     // En passant
-    // (To be remade I think.)
-    else if (this.type === "Pawn" && hasPiece?.canBeEaten) {
+    else if (this.type === "Pawn") {
       const sign = this.shade === "dark" ? -1 : 1;
-      const p = board.getSquare(dst.rank - sign, dst.file);
-      if (p) {
-        board.setPiece(null, p.pos.rank, p.pos.file);
-        (this as unknown as Pawn).canTakeEnPassant = null;
-        (this as unknown as Pawn).timesEnPassant++;
+      const pawn = this as unknown as Pawn;
+      if (
+        pawn.canTakeEnPassant?.pos?.file === dst.file &&
+        pawn.canTakeEnPassant.pos.rank === dst.rank - sign
+      ) {
+        board.setPiece(
+          null,
+          pawn.canTakeEnPassant.pos.rank,
+          pawn.canTakeEnPassant.pos.file
+        );
+        board.pieces = board.pieces.filter((p) => p !== pawn.canTakeEnPassant);
+        pawn.canTakeEnPassant = null;
+        pawn.timesEnPassant = pawn.timesEnPassant + 1;
       }
     }
 

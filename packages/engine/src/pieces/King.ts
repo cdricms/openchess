@@ -1,5 +1,5 @@
 import Board from "../Board.js";
-import { Position, Shade } from "../common.js";
+import { PathToEnemyKing, Position, Shade } from "../common.js";
 import {
   Direction,
   DirectionString,
@@ -18,7 +18,18 @@ export default class King extends Piece {
 
   #isProtected(piece: Piece | null): boolean {
     if (piece) {
-      return this.threatenedBy.has(piece) && piece.protectedBy.size > 0;
+      return this.threatenedBy.has(piece) || piece.protectedBy.size > 0;
+    }
+    return false;
+  }
+
+  #isInScope(square: Square): boolean {
+    for (const piece of this.threatenedBy) {
+      if ("getPathToEnemyKing" in piece) {
+        return (piece as Piece & PathToEnemyKing).pathToEnemyKing.includes(
+          square
+        );
+      }
     }
     return false;
   }
@@ -31,7 +42,8 @@ export default class King extends Piece {
       if (
         this.checkMoveLegality(m) &&
         !enCoverage.has(m) &&
-        !this.#isProtected(m.piece)
+        !this.#isProtected(m.piece) &&
+        !this.#isInScope(m)
       ) {
         lMoves.push(m);
       }
