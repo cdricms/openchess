@@ -18,7 +18,7 @@ export default class King extends Piece {
 
   #isProtected(piece: Piece | null): boolean {
     if (piece) {
-      return this.threatenedBy.has(piece) || piece.protectedBy.size > 0;
+      return this.threatenedBy.has(piece) && piece.protectedBy.size > 0;
     }
     return false;
   }
@@ -40,8 +40,11 @@ export default class King extends Piece {
     const lMoves: Square[] = [];
     this.defaultMoves.forEach((m) => {
       if (
+        // Check if this move is legal based on basic rules
         this.checkMoveLegality(m) &&
+        // Check if this move is not covered by an enemy
         !enCoverage.has(m) &&
+        // Check if this
         !this.#isProtected(m.piece) &&
         !this.#isInScope(m)
       ) {
