@@ -16,7 +16,15 @@ const _sketch = (p5: p5) => {
     const canvas = p5.createCanvas(config.canvasSize, config.canvasSize);
     canvas.parent(config.canvasParent);
     p5.background(0, 0, 0);
+    let input = p5.createInput(board.fen, "text");
     board.loadPieces();
+    //@ts-ignore
+    input.input((e) => {
+      p5.background(0, 0, 0);
+      //@ts-ignore
+      p5.clear();
+      board.fen = e.target.value;
+    });
   };
 
   const mapPosIntoCoords = (

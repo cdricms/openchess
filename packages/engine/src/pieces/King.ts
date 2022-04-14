@@ -81,6 +81,37 @@ export default class King extends Piece {
 
     /// Need to add the possibility to castle.
 
+    if (this.timesMoved === 0) {
+      const rook1 = board.getPiece(this.pos?.rank!, this.pos?.file! + 3);
+      const rook2 = board.getPiece(this.pos?.rank!, this.pos?.file! - 4);
+      if (rook1 && rook1.type === "Rook" && rook1.shade === this.shade) {
+        let eastSide = true;
+        for (let i = 1; i < 3; i++) {
+          if (board.getPiece(this.pos?.rank!, this.pos?.file! + i)) {
+            eastSide = false;
+            break;
+          }
+        }
+        if (eastSide) {
+          const s = board.getSquare(this.pos?.rank!, this.pos?.file! + 2);
+          if (s) moves.push(s);
+        }
+      }
+      if (rook2 && rook2.type === "Rook" && rook2.shade === this.shade) {
+        let westSide = true;
+        for (let i = 1; i < 4; i++) {
+          if (board.getPiece(this.pos?.rank!, this.pos?.file! - i)) {
+            westSide = false;
+            break;
+          }
+        }
+        if (westSide) {
+          const s = board.getSquare(this.pos?.rank!, this.pos?.file! - 2);
+          if (s) moves.push(s);
+        }
+      }
+    }
+
     return moves;
   }
 }

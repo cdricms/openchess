@@ -267,6 +267,30 @@ export default class Piece {
       }
     }
 
+    // Castle
+    else if (this.type === "King" && this.timesMoved === 0) {
+      const east = this.legalMoves.find(
+        (move) =>
+          move.pos.file === this.pos?.file! + 2 &&
+          move.pos.rank === this.pos?.rank
+      );
+      const west = this.legalMoves.find(
+        (move) =>
+          move.pos.file === this.pos?.file! - 2 &&
+          move.pos.rank === this.pos?.rank
+      );
+      if (east) {
+        const rookEast = board.getPiece(this.pos?.rank!, this.pos?.file! + 3);
+        if (rookEast) {
+          board.setPiece(rookEast, this.pos?.rank!, this.pos?.file! + 1);
+        }
+      }
+      if (west) {
+        const rookWest = board.getPiece(this.pos?.rank!, this.pos?.file! - 4);
+        board.setPiece(rookWest, this.pos?.rank!, this.pos?.file! - 1);
+      }
+    }
+
     // Set this piece to its new location.
     board.setPiece(this, dst.rank, dst.file);
     // Update the history of times moves
