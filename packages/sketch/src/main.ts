@@ -18,19 +18,15 @@ const _sketch = (p5: p5) => {
     url.searchParams.set("fen", board.fen);
     history.replaceState("", "", url);
   };
-  window.onload = () => {
-    const fen = new URL(location.href).searchParams.get("fen");
-    if (fen) {
-      board.fen = fen;
-      inputFen.elt.value = board.fen;
-    }
-  };
 
   p5.setup = () => {
     const canvas = p5.createCanvas(config.canvasSize, config.canvasSize);
     canvas.parent(config.canvasParent);
     p5.background(0, 0, 0);
+    const fen = new URL(location.href).searchParams.get("fen");
     board.loadPieces();
+    if (fen) board.fen = fen;
+    inputFen.elt.value = board.fen;
     //@ts-ignore
     inputFen.input((e) => {
       board.fen = e.target.value;
