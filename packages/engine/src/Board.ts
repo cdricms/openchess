@@ -76,6 +76,7 @@ export default class Board {
 
   public emptyBoard() {
     // To empty the board simply regenerate the board based on the FEN without any pieces.
+    this.pieces = [];
     this.board = this.#generateBoard();
   }
 
@@ -362,7 +363,22 @@ export default class Board {
 
   public movePiece(dst: Position, piece: Piece | null) {
     if (piece) {
+      const lastPos = { ...piece.pos };
       piece.move(dst, this);
+      // Change piece
+      const sign = piece.shade === "dark" ? -1 : 1;
+      if (
+        piece.type === "Pawn" &&
+        dst.rank === lastPos.rank! + sign &&
+        dst.rank === (piece.shade === "dark" ? 0 : 7)
+      ) {
+        const queen = new Queen(piece.shade, this, piece.pos);
+        queen.uuid = piece.uuid;
+        this.setPiece(queen, queen.pos?.rank!, queen.pos?.file!);
+        this.pieces = this.pieces.filter((p) => p.uuid !== piece.uuid);
+        this.pieces.push(queen);
+        console.table(this.pieces);
+      }
       this.#scan();
     }
   }
