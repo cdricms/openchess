@@ -283,12 +283,16 @@ export default class Piece {
       if (east) {
         const rookEast = board.getPiece(this.pos?.rank!, this.pos?.file! + 3);
         if (rookEast) {
+          board.setPiece(null, rookEast.pos?.rank!, rookEast.pos?.file!);
           board.setPiece(rookEast, this.pos?.rank!, this.pos?.file! + 1);
         }
       }
       if (west) {
         const rookWest = board.getPiece(this.pos?.rank!, this.pos?.file! - 4);
-        board.setPiece(rookWest, this.pos?.rank!, this.pos?.file! - 1);
+        if (rookWest) {
+          board.setPiece(null, rookWest.pos?.rank!, rookWest.pos?.file!);
+          board.setPiece(rookWest, this.pos?.rank!, this.pos?.file! - 1);
+        }
       }
     }
 
