@@ -20,7 +20,10 @@ const _sketch = (p5: p5) => {
   };
   window.onload = () => {
     const fen = new URL(location.href).searchParams.get("fen");
-    if (fen) board.fen = fen;
+    if (fen) {
+      board.fen = fen;
+      inputFen.elt.value = board.fen;
+    }
   };
 
   p5.setup = () => {
