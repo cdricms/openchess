@@ -11,19 +11,32 @@ const _sketch = (p5: p5) => {
   const board = new Board();
   let selectedSquare: Square | null = null;
   let draggingPiece = false;
+  let inputFen = p5.createInput(board.fen, "text");
+  inputFen.style("width", "100%");
+  inputFen.elt.onchange = () => {
+    const url = new URL(location.href);
+    url.searchParams.set("fen", board.fen);
+    history.replaceState("", "", url);
+  };
+  window.onload = () => {
+    const fen = new URL(location.href).searchParams.get("fen");
+    if (fen) board.fen = fen;
+  };
 
   p5.setup = () => {
     const canvas = p5.createCanvas(config.canvasSize, config.canvasSize);
     canvas.parent(config.canvasParent);
     p5.background(0, 0, 0);
-    let input = p5.createInput(board.fen, "text");
     board.loadPieces();
     //@ts-ignore
-    input.input((e) => {
-      p5.background(0, 0, 0);
-      //@ts-ignore
-      p5.clear();
+    inputFen.input((e) => {
       board.fen = e.target.value;
+    });
+    const resetBtn = p5.createButton("Reset FEN");
+    resetBtn.mouseClicked(() => {
+      board.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+      inputFen.elt.value = board.fen;
+      inputFen.elt.onchange();
     });
   };
 
@@ -151,6 +164,8 @@ const _sketch = (p5: p5) => {
         }
       }
     });
+    inputFen.elt.value = board.fen;
+    inputFen.elt.onchange();
   };
 
   p5.mousePressed = () => {

@@ -243,15 +243,6 @@ export default class Piece {
     // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
 
-    // Change piece
-    if (
-      this.type === "Pawn" &&
-      dst.rank === this.pos?.rank! + sign &&
-      dst.rank === (this.shade === "dark" ? 0 : 7)
-    ) {
-      console.log("Change piece");
-    }
-
     if (hasPiece && hasPiece.canBeEaten) {
       // Piece gets eaten
       const en = board.getPiece(dst.rank, dst.file);
