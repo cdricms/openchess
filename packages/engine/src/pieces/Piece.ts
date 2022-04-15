@@ -24,7 +24,7 @@ export default class Piece {
   threatenedBy: Set<Piece> = new Set();
   protects: Set<Piece> = new Set();
   protectedBy: Set<Piece> = new Set();
-  readonly uuid = uuidv4();
+  uuid = uuidv4();
   myKingIsUnderCheck: boolean = false;
   #_initialSquares: Position[] = [];
   timesMoved = 0;
@@ -231,6 +231,7 @@ export default class Piece {
   }
 
   public move(dst: Position, board: Board) {
+    const sign = this.shade === "dark" ? -1 : 1;
     // Get the new square
     const s = board.getSquare(dst.rank, dst.file);
     // If it doesn't exist, then we simply return.
@@ -241,6 +242,16 @@ export default class Piece {
     if (hasPiece && !hasPiece?.canBeEaten) return;
     // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
+
+    // Change piece
+    if (
+      this.type === "Pawn" &&
+      dst.rank === this.pos?.rank! + sign &&
+      dst.rank === (this.shade === "dark" ? 0 : 7)
+    ) {
+      console.log("Change piece");
+    }
+
     if (hasPiece && hasPiece.canBeEaten) {
       // Piece gets eaten
       const en = board.getPiece(dst.rank, dst.file);
@@ -250,7 +261,6 @@ export default class Piece {
 
     // En passant
     else if (this.type === "Pawn") {
-      const sign = this.shade === "dark" ? -1 : 1;
       const pawn = this as unknown as Pawn;
       if (
         pawn.canTakeEnPassant?.pos?.file === dst.file &&
