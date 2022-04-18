@@ -231,15 +231,16 @@ export default class Piece {
   }
 
   public move(dst: Position, board: Board) {
+    let an = `${this.type === "Pawn" ? "" : this.fenChar.toUpperCase()}`;
     const sign = this.shade === "dark" ? -1 : 1;
     // Get the new square
     const s = board.getSquare(dst.rank, dst.file);
     // If it doesn't exist, then we simply return.
-    if (!s) return;
+    if (!s) return false;
     // Check if the move is legal, if not return.
     const hasPiece = s?.piece;
-    if (s && !this.isMoveLegal(s)) return;
-    if (hasPiece && !hasPiece?.canBeEaten) return;
+    if (s && !this.isMoveLegal(s)) return false;
+    if (hasPiece && !hasPiece?.canBeEaten) return false;
     // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
 
@@ -248,6 +249,7 @@ export default class Piece {
       const en = board.getPiece(dst.rank, dst.file);
       board.pieces = board.pieces.filter((p) => p !== en);
       board.setPiece(null, dst.rank, dst.file);
+      an += `x${s.chessPosition.file.toLowerCase()}${s.chessPosition.rank}`;
     }
 
     // En passant
@@ -257,6 +259,7 @@ export default class Piece {
         pawn.canTakeEnPassant?.pos?.file === dst.file &&
         pawn.canTakeEnPassant.pos.rank === dst.rank - sign
       ) {
+        const actualSquare = board.getSquare(pawn.pos?.rank!, pawn.pos?.file!);
         board.setPiece(
           null,
           pawn.canTakeEnPassant.pos.rank,
@@ -265,6 +268,11 @@ export default class Piece {
         board.pieces = board.pieces.filter((p) => p !== pawn.canTakeEnPassant);
         pawn.canTakeEnPassant = null;
         pawn.timesEnPassant = pawn.timesEnPassant + 1;
+        an = `${actualSquare?.chessPosition.file.toLowerCase()}x${s.chessPosition.file.toLowerCase()}${
+          s.chessPosition.rank
+        } e.p`;
+      } else {
+        an = `${s.chessPosition.file.toLowerCase()}${s.chessPosition.rank}`;
       }
     }
 
@@ -280,20 +288,28 @@ export default class Piece {
           move.pos.file === this.pos?.file! - 2 &&
           move.pos.rank === this.pos?.rank
       );
-      if (east) {
-        const rookEast = board.getPiece(this.pos?.rank!, this.pos?.file! + 3);
-        if (rookEast) {
-          board.setPiece(null, rookEast.pos?.rank!, rookEast.pos?.file!);
-          board.setPiece(rookEast, this.pos?.rank!, this.pos?.file! + 1);
+      if (east || west) {
+        if (east) {
+          const rookEast = board.getPiece(this.pos?.rank!, this.pos?.file! + 3);
+          if (rookEast) {
+            board.setPiece(null, rookEast.pos?.rank!, rookEast.pos?.file!);
+            board.setPiece(rookEast, this.pos?.rank!, this.pos?.file! + 1);
+            an = "O-O";
+          }
         }
-      }
-      if (west) {
-        const rookWest = board.getPiece(this.pos?.rank!, this.pos?.file! - 4);
-        if (rookWest) {
-          board.setPiece(null, rookWest.pos?.rank!, rookWest.pos?.file!);
-          board.setPiece(rookWest, this.pos?.rank!, this.pos?.file! - 1);
+        if (west) {
+          const rookWest = board.getPiece(this.pos?.rank!, this.pos?.file! - 4);
+          if (rookWest) {
+            board.setPiece(null, rookWest.pos?.rank!, rookWest.pos?.file!);
+            board.setPiece(rookWest, this.pos?.rank!, this.pos?.file! - 1);
+            an = "O-O-O";
+          }
         }
+      } else {
+        an += `${s.chessPosition.file.toLowerCase()}${s.chessPosition.rank}`;
       }
+    } else {
+      an += `${s.chessPosition.file.toLowerCase()}${s.chessPosition.rank}`;
     }
 
     // Set this piece to its new location.
@@ -304,6 +320,7 @@ export default class Piece {
     board.pieceHistory.set(this.uuid, timesMoved! + 1);
     board.totalMoves++;
     // Update the order.
-    board.history.push({ uuid: this.uuid });
+    board.history.push({ uuid: this.uuid, an });
+    return true;
   }
 }

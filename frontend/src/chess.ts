@@ -1,52 +1,44 @@
-import { Board, Game, Piece, Square } from "@cdricms/engine";
-import { Position } from "@cdricms/engine/src/common";
-import p5 from "p5";
+import { Board, Piece, Square } from "@cdricms/engine";
+import type { Position } from "@cdricms/engine/src/common";
+import type p5 from "p5";
 
 export const config = {
   canvasSize: 900,
-  canvasParent: "app",
-  game: new Game()
+  canvasParent: "game",
+  board: new Board()
 };
-
-export const boardEvents = {
-  //@ts-ignore
-  onpiecemove: (piece: Piece, dst: Square, move: number) => {}
-};
-
-export type BoardEvents = typeof boardEvents;
-
-// const table = document.getElementById("history");
+const table = document.getElementById("history");
 
 export const _sketch = (p5: p5) => {
-  const { board } = config.game;
+  const { board } = config;
   let selectedSquare: Square | null = null;
   let draggingPiece = false;
-  // let inputFen = p5.createInput(board.fen, "text");
-  // inputFen.style("width", "100%");
-  // inputFen.elt.onchange = () => {
-  //   const url = new URL(location.href);
-  //   url.searchParams.set("fen", board.fen);
-  //   history.replaceState("", "", url);
-  // };
+  let inputFen = p5.createInput(board.fen, "text");
+  inputFen.style("width", "100%");
+  inputFen.elt.onchange = () => {
+    const url = new URL(location.href);
+    url.searchParams.set("fen", board.fen);
+    history.replaceState("", "", url);
+  };
 
   p5.setup = () => {
     const canvas = p5.createCanvas(config.canvasSize, config.canvasSize);
     canvas.parent(config.canvasParent);
     p5.background(0, 0, 0);
-    // const fen = new URL(location.href).searchParams.get("fen");
+    const fen = new URL(location.href).searchParams.get("fen");
     board.loadPieces();
-    // if (fen) board.fen = fen;
-    // inputFen.elt.value = board.fen;
+    if (fen) board.fen = fen;
+    inputFen.elt.value = board.fen;
     //@ts-ignore
-    // inputFen.input((e) => {
-    //   board.fen = e.target.value;
-    // });
-    // const resetBtn = p5.createButton("Reset FEN");
-    // resetBtn.mouseClicked(() => {
-    //   board.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    //   inputFen.elt.value = board.fen;
-    //   inputFen.elt.onchange();
-    // });
+    inputFen.input((e) => {
+      board.fen = e.target.value;
+    });
+    const resetBtn = p5.createButton("Reset FEN");
+    resetBtn.mouseClicked(() => {
+      board.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+      inputFen.elt.value = board.fen;
+      inputFen.elt.onchange();
+    });
   };
 
   const mapPosIntoCoords = (
@@ -162,12 +154,18 @@ export const _sketch = (p5: p5) => {
     selectedSquare?.piece?.legalMoves.forEach((m) => {
       const [c] = checkClick(m);
       if (c) {
-        const piece = selectedSquare!.piece;
-        const hasMoved = board.movePiece(m.pos, selectedSquare!.piece);
-        if (hasMoved) {
-          boardEvents.onpiecemove(piece!, m, config.game.board.history.length);
-          selectedSquare = null;
-        }
+        board.movePiece(m.pos, selectedSquare!.piece);
+        selectedSquare = null;
+        const tr = document.createElement("tr");
+        const thAn = document.createElement("th");
+        const thMove = document.createElement("th");
+        thMove.textContent = board.history.length.toString();
+        thAn.textContent = board.history[board.history.length - 1].an;
+        tr.appendChild(thMove);
+        tr.appendChild(thAn);
+        table?.appendChild(tr);
+        inputFen.elt.value = board.fen;
+        inputFen.elt.onchange();
       }
     });
     board.forEach((square) => {
@@ -186,6 +184,11 @@ export const _sketch = (p5: p5) => {
         break;
     }
   };
+
+  // p5.mouseClicked = () => {
+  //   console.log("cliked");
+  //   move();
+  // };
 
   p5.mouseDragged = () => {
     switch (p5.mouseButton) {
