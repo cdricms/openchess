@@ -12,6 +12,7 @@ import King from "./pieces/King.js";
 import Queen from "./pieces/Queen.js";
 import Knight from "./pieces/Knight.js";
 import Pawn from "./pieces/Pawn.js";
+import Game from "./Game.js";
 
 export default class Board {
   board: Square[][];
@@ -25,6 +26,8 @@ export default class Board {
   public totalMoves = 0;
   public whoWon: Shade | "draw" | null = null;
   public history: { uuid: string; an: string }[] = [];
+  game: Game | null = null;
+  strict: boolean = true;
 
   // The board is generated based on FEN: https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
@@ -180,7 +183,6 @@ export default class Board {
   }
 
   #scan() {
-    console.table(this.history);
     // I would like to note that this algorithm is far from being perfect, and should actually be revisited to make it more accurate.
     // It could also be optimized, maybe by using a caching method. But not sure about that.
 
@@ -362,25 +364,37 @@ export default class Board {
   }
 
   public movePiece(dst: Position, piece: Piece | null) {
-    if (piece) {
-      const lastPos = { ...piece.pos };
-      piece.move(dst, this);
-      // Change piece
-      const sign = piece.shade === "dark" ? -1 : 1;
-      if (
-        piece.type === "Pawn" &&
-        dst.rank === lastPos.rank! + sign &&
-        dst.rank === (piece.shade === "dark" ? 0 : 7)
-      ) {
-        const queen = new Queen(piece.shade, this, piece.pos);
-        queen.uuid = piece.uuid;
-        this.setPiece(queen, queen.pos?.rank!, queen.pos?.file!);
-        this.pieces = this.pieces.filter((p) => p !== piece);
-        this.pieces.push(queen);
-        console.table(this.pieces);
+    if (this.game?.hasStarted && !this.game?.isPaused) {
+      if (piece) {
+        if (this.strict && this.game) {
+          if (piece.shade !== this.game.currentPlayer.shade) return false;
+        }
+        const lastPos = { ...piece.pos };
+        const hasMoved = piece.move(dst, this);
+        if (hasMoved) {
+          if (this.history.length === 1) {
+            this.game.start();
+          }
+          this.game?.switch();
+        }
+        // Change piece
+        const sign = piece.shade === "dark" ? -1 : 1;
+        if (
+          piece.type === "Pawn" &&
+          dst.rank === lastPos.rank! + sign &&
+          dst.rank === (piece.shade === "dark" ? 0 : 7)
+        ) {
+          const queen = new Queen(piece.shade, this, piece.pos);
+          queen.uuid = piece.uuid;
+          this.setPiece(queen, queen.pos?.rank!, queen.pos?.file!);
+          this.pieces = this.pieces.filter((p) => p !== piece);
+          this.pieces.push(queen);
+        }
+        this.#scan();
+        return hasMoved;
       }
-      this.#scan();
     }
+    return false;
   }
 
   public displayInConsole() {

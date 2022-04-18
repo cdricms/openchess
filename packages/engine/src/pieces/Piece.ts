@@ -236,11 +236,11 @@ export default class Piece {
     // Get the new square
     const s = board.getSquare(dst.rank, dst.file);
     // If it doesn't exist, then we simply return.
-    if (!s) return;
+    if (!s) return false;
     // Check if the move is legal, if not return.
     const hasPiece = s?.piece;
-    if (s && !this.isMoveLegal(s)) return;
-    if (hasPiece && !hasPiece?.canBeEaten) return;
+    if (s && !this.isMoveLegal(s)) return false;
+    if (hasPiece && !hasPiece?.canBeEaten) return false;
     // Remove this piece from the current square
     if (this.pos) board.setPiece(null, this.pos.rank, this.pos.file);
 
@@ -321,5 +321,6 @@ export default class Piece {
     board.totalMoves++;
     // Update the order.
     board.history.push({ uuid: this.uuid, an });
+    return true;
   }
 }

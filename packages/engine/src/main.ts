@@ -8,6 +8,8 @@ import Queen from "./pieces/Queen.js";
 import Rook from "./pieces/Rook.js";
 import * as common from "./common.js";
 import Square from "./Square.js";
+import Game from "./Game.js";
+import Player from "./Player.js";
 
 export {
   Board,
@@ -19,5 +21,7 @@ export {
   Piece,
   Queen,
   Rook,
+  Game,
+  Player,
   common
 };
