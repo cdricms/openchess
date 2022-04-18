@@ -24,7 +24,7 @@ export default class Board {
   public pieceHistory: Map<string, number> = new Map();
   public totalMoves = 0;
   public whoWon: Shade | "draw" | null = null;
-  public history: { uuid: string }[] = [];
+  public history: { uuid: string; an: string }[] = [];
 
   // The board is generated based on FEN: https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   constructor(fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
@@ -375,7 +375,7 @@ export default class Board {
         const queen = new Queen(piece.shade, this, piece.pos);
         queen.uuid = piece.uuid;
         this.setPiece(queen, queen.pos?.rank!, queen.pos?.file!);
-        this.pieces = this.pieces.filter((p) => p.uuid !== piece.uuid);
+        this.pieces = this.pieces.filter((p) => p !== piece);
         this.pieces.push(queen);
         console.table(this.pieces);
       }

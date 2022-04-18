@@ -6,6 +6,7 @@ export const config = {
   canvasSize: 900,
   canvasParent: "app"
 };
+const table = document.getElementById("history");
 
 const _sketch = (p5: p5) => {
   const board = new Board();
@@ -154,6 +155,16 @@ const _sketch = (p5: p5) => {
       if (c) {
         board.movePiece(m.pos, selectedSquare!.piece);
         selectedSquare = null;
+        const tr = document.createElement("tr");
+        const thAn = document.createElement("th");
+        const thMove = document.createElement("th");
+        thMove.textContent = board.history.length.toString();
+        thAn.textContent = board.history[board.history.length - 1].an;
+        tr.appendChild(thMove);
+        tr.appendChild(thAn);
+        table?.appendChild(tr);
+        inputFen.elt.value = board.fen;
+        inputFen.elt.onchange();
       }
     });
     board.forEach((square) => {
@@ -163,8 +174,6 @@ const _sketch = (p5: p5) => {
         }
       }
     });
-    inputFen.elt.value = board.fen;
-    inputFen.elt.onchange();
   };
 
   p5.mousePressed = () => {
