@@ -4,12 +4,13 @@ import p5 from "p5";
 
 export const config = {
   canvasSize: 900,
-  canvasParent: "app"
+  canvasParent: "app",
+  board: new Board()
 };
 const table = document.getElementById("history");
 
 const _sketch = (p5: p5) => {
-  const board = new Board();
+  const { board } = config;
   let selectedSquare: Square | null = null;
   let draggingPiece = false;
   let inputFen = p5.createInput(board.fen, "text");
