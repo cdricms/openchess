@@ -8,7 +8,7 @@
   if (url.searchParams.get("fen"))
     config.game.board.fen = url.searchParams.get("fen");
 
-  config.game.board.fen = "2k5/p1B1Q3/1pnbp3/8/8/8/8/8";
+  // config.game.board.fen = "2k5/p1B1Q3/1pnbp3/8/8/8/8/8";
   $: game = config.game;
   config.canvasParent = "game";
   config.canvasSize = 700;
