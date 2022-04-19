@@ -18,7 +18,7 @@ export default class King extends Piece {
 
   #isProtected(piece: Piece | null): boolean {
     if (piece) {
-      return this.threatenedBy.has(piece) && piece.protectedBy.size > 0;
+      return piece.protectedBy.size > 0;
     }
     return false;
   }
