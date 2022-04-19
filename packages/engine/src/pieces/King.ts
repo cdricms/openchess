@@ -34,6 +34,18 @@ export default class King extends Piece {
     return false;
   }
 
+  #canCastle(m?: Square) {
+    return this.timesMoved === 0 && this.threatenedBy.size === 0;
+  }
+
+  #castleMove(m?: Square) {
+    return (
+      m &&
+      m.pos.rank === this.pos?.rank &&
+      (this.pos.file + 2 === m.pos.file || this.pos.file - 2 === m.pos.file)
+    );
+  }
+
   public getLegalMoves(board: Board): Square[] {
     const enCoverage =
       this.shade === "dark" ? board.lightCoverage : board.darkCoverage;
@@ -44,11 +56,18 @@ export default class King extends Piece {
         this.checkMoveLegality(m) &&
         // Check if this move is not covered by an enemy
         !enCoverage.has(m) &&
-        // Check if this
         !this.#isProtected(m.piece) &&
         !this.#isInScope(m)
       ) {
-        lMoves.push(m);
+        // It works, but a bit ugly.
+        // TODO: Maybe should be remade.
+        if (this.#castleMove(m)) {
+          if (this.#canCastle(m)) {
+            lMoves.push(m);
+          }
+        } else {
+          lMoves.push(m);
+        }
       }
     });
     return lMoves;
