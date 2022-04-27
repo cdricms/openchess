@@ -1,5 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import Board from "./Board.js";
+import { Shade } from "./common.js";
 import Player from "./Player.js";
 
 export default class Game {
@@ -14,6 +15,7 @@ export default class Game {
     light: { ...this.light.events },
     dark: { ...this.dark.events }
   };
+  whoWon: Shade | "draw" | null = null;
 
   constructor() {
     this.board = new Board();

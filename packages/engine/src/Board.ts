@@ -24,7 +24,6 @@ export default class Board {
   public lightCoverage: Set<Square> = new Set();
   public pieceHistory: Map<string, number> = new Map();
   public totalMoves = 0;
-  public whoWon: Shade | "draw" | null = null;
   public history: { uuid: string; an: string }[] = [];
   game: Game | null = null;
   strict: boolean = true;
@@ -212,6 +211,7 @@ export default class Board {
       if (p.doIIntersect()) {
         p.threatenedBy.forEach((threat) => {
           p.legalMoves = p.legalMoves.filter((m) => m.piece === threat);
+          p.coverage = p.getCoverageMoves(this);
         });
       }
       if (p.shade === "light") {
@@ -225,19 +225,32 @@ export default class Board {
     // And verify if they are under check.
     if (this.darkKing) {
       this.darkKing.legalMoves = this.darkKing.getLegalMoves(this);
+      this.darkKing.coverage = this.darkKing.getCoverageMoves(this);
       if (this.darkKing.isUnderCheck) {
         this.#signalKingUnderCheck(this.darkKing);
       }
     }
     if (this.lightKing) {
       this.lightKing.legalMoves = this.lightKing.getLegalMoves(this);
+      this.lightKing.coverage = this.lightKing.getCoverageMoves(this);
       if (this.lightKing.isUnderCheck) {
         this.#signalKingUnderCheck(this.lightKing);
       }
     }
     // If one side cannot move any piece then the adversary won.
-    if (this.darkCoverage.size === 0) this.whoWon = "light";
-    if (this.lightCoverage.size === 0) this.whoWon = "dark";
+    if (this.game) {
+      if (this.darkCoverage.size === 0) {
+        this.game.whoWon = "light";
+      }
+      if (this.lightCoverage.size === 0) {
+        this.game.whoWon = "dark";
+      }
+
+      if (this.darkCoverage.size === 0 || this.lightCoverage.size === 0) {
+        this.history[this.history.length - 1].an += "#";
+        this.game.pause();
+      }
+    }
   }
 
   #signalKingUnderCheck(king: King) {
@@ -249,6 +262,11 @@ export default class Board {
       if (p.shade === king.shade && p.type !== "King") {
         p.myKingIsUnderCheck = true;
         p.findMovesToProtectKing(this);
+        if (p.type === "Pawn" && p.legalMoves.length === 0) {
+          p.coverage = [];
+        } else {
+          p.coverage = p.getCoverageMoves(this);
+        }
       }
     });
     // And update their coverage.
