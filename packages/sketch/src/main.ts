@@ -21,32 +21,12 @@ export const _sketch = (p5: p5) => {
   const { board } = config.game;
   let selectedSquare: Square | null = null;
   let draggingPiece = false;
-  // let inputFen = p5.createInput(board.fen, "text");
-  // inputFen.style("width", "100%");
-  // inputFen.elt.onchange = () => {
-  //   const url = new URL(location.href);
-  //   url.searchParams.set("fen", board.fen);
-  //   history.replaceState("", "", url);
-  // };
 
   p5.setup = () => {
     const canvas = p5.createCanvas(config.canvasSize, config.canvasSize);
     canvas.parent(config.canvasParent);
     p5.background(0, 0, 0);
-    // const fen = new URL(location.href).searchParams.get("fen");
     board.loadPieces();
-    // if (fen) board.fen = fen;
-    // inputFen.elt.value = board.fen;
-    //@ts-ignore
-    // inputFen.input((e) => {
-    //   board.fen = e.target.value;
-    // });
-    // const resetBtn = p5.createButton("Reset FEN");
-    // resetBtn.mouseClicked(() => {
-    //   board.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    //   inputFen.elt.value = board.fen;
-    //   inputFen.elt.onchange();
-    // });
   };
 
   const mapPosIntoCoords = (
@@ -208,6 +188,16 @@ export const _sketch = (p5: p5) => {
 
   p5.draw = () => {
     drawBoard(board);
+    // board.pieces.forEach((p) => {
+    //   if (p.shade === "dark") {
+    //     p.coverage.forEach((c) => {
+    //       drawSquare(c, (x, y) => {
+    //         p5.fill(255, 0, 120, 175);
+    //         p5.square(x, y, p5.width / 8);
+    //       });
+    //     });
+    //   }
+    // });
     // p5.noLoop();
   };
 };

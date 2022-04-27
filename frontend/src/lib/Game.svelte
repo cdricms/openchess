@@ -3,6 +3,7 @@
   import Player from "./Player.svelte";
 
   export let game: Game;
+  $: whoWon = game.whoWon;
 </script>
 
 <section id="main">
@@ -25,6 +26,7 @@
       {/each}
     </table>
   </div>
+  {whoWon}
 </section>
 
 <style>
