@@ -62,8 +62,11 @@ export default class Pawn extends Piece {
   }
 
   #isEnPassant(pawn: Pawn, board: Board) {
+    const sign = pawn.shade === "dark" ? -1 : 1;
     if (
+      pawn.shade !== this.shade &&
       pawn.timesMoved === 1 &&
+      pawn.initialSquares[0].rank === pawn.pos!.rank - sign * 2 &&
       board.history[board.history.length - 1].uuid === pawn.uuid
     ) {
       this.canTakeEnPassant = pawn;

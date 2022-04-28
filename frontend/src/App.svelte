@@ -15,7 +15,6 @@
 
   boardEvents.onpiecemove = (p, m, move) => {
     game = config.game;
-    console.log(game.board.darkCoverage.size);
   };
 
   const sketch = new p5(_sketch);
