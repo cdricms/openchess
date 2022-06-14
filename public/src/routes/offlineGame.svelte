@@ -1,7 +1,7 @@
 <script lang="ts">
   import { config, _sketch, boardEvents } from "@cdricms/sketch/src/main";
   import p5 from "p5";
-  import Game from "./lib/Game.svelte";
+  import Game from "../lib/Game/Game.svelte";
 
   const url = new URL(location.href);
 
@@ -13,12 +13,11 @@
   config.canvasParent = "game";
   config.canvasSize = 700;
 
-  boardEvents.onpiecemove = (p, m, move) => {
+  boardEvents.onpiecemove = () => {
     game = config.game;
   };
 
   const sketch = new p5(_sketch);
-  console.table(config.game.board.darkKing);
 </script>
 
 <main style="--game-height: {config.canvasSize}px">
@@ -27,17 +26,6 @@
   <button on:click={(_) => (game.isPaused ? game.start() : game.pause())}
     >Pause</button
   >
-  <!-- <input
-    type="text"
-    value={fen}
-    on:input={(e) => {
-      fen = e.currentTarget.value;
-      game.board.fen = fen;
-    }}
-    on:change={(e) => {
-      if (fen !== game.board.fen) fen = game.board.fen;
-    }}
-  /> -->
 </main>
 
 <style>

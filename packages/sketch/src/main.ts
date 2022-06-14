@@ -10,7 +10,12 @@ export const config = {
 
 export const boardEvents = {
   //@ts-ignore
-  onpiecemove: (piece: Piece, dst: Square, move: number) => {}
+  onpiecemove: (
+    piece: Piece,
+    current: Square,
+    previous: Square,
+    move: number
+  ) => {}
 };
 
 export type BoardEvents = typeof boardEvents;
@@ -145,7 +150,12 @@ export const _sketch = (p5: p5) => {
         const piece = selectedSquare!.piece;
         const hasMoved = board.movePiece(m.pos, selectedSquare!.piece);
         if (hasMoved) {
-          boardEvents.onpiecemove(piece!, m, config.game.board.history.length);
+          boardEvents.onpiecemove(
+            piece!,
+            m,
+            selectedSquare!,
+            config.game.board.history.length
+          );
           selectedSquare = null;
         }
       }
